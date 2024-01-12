@@ -1,5 +1,5 @@
 import { useSnackbar } from 'notistack'
-import type { EnqueueSnackbar, OptionsObject } from 'notistack'
+import type { OptionsObject } from 'notistack'
 
 export const ERR_TOP_CENTER: OptionsObject = {
   variant: 'error',
@@ -17,22 +17,6 @@ export const SUCCESS_TOP_CENTER: OptionsObject = {
   variant: 'success',
   anchorOrigin: { vertical: 'top', horizontal: 'center' }
 }
-
-// export function successNotify(enqueueSnackbar: EnqueueSnackbar, message: string) {
-//   enqueueSnackbar(message, SUCCESS_TOP_CENTER)
-// }
-
-// export function infoNotify(enqueueSnackbar: EnqueueSnackbar, message: string) {
-//   enqueueSnackbar(message, INFO_TOP_CENTER)
-// }
-
-// export function warnNotify(enqueueSnackbar: EnqueueSnackbar, message: string) {
-//   enqueueSnackbar(message, WARNING_TOP_CENTER)
-// }
-
-// export function errorNotify(enqueueSnackbar: EnqueueSnackbar, message: string) {
-//   enqueueSnackbar(message, ERR_TOP_CENTER)
-// }
 
 export default function useNotify() {
   const { enqueueSnackbar } = useSnackbar()

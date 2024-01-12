@@ -17,11 +17,7 @@ import { Settings } from 'src/@core/context/settingsContext'
 import ModeToggler from 'src/@core/layouts/components/shared-components/ModeToggler'
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
-import { Button } from '@mui/material'
-import { BrowserProvider, ethers } from 'ethers'
-import { useState } from 'react'
 import ConnectWalletButton from '../connection/ConnectWalletButton'
-// import { Connector, useConnect } from 'wagmi'
 
 interface Props {
   hidden: boolean
@@ -36,44 +32,6 @@ const AppBarContent = (props: Props) => {
 
   // ** Hook
   const hiddenSm = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
-  const [curProvider, setCurProvider] = useState<BrowserProvider>()
-  // const { connectors, connect } = useConnect()
-
-  // ** Wallet
-  // const provider = new ethers.BrowserProvider(window.ethereum)
-  // const connectwalletHandler = () => {
-  //   if (window.ethereum) {
-  //     provider.send('eth_requestAccounts', []).then(async wallet => {
-  //       console.log(wallet)
-  //       console.log('provider', await provider.getSigner())
-  //       const signer = await provider.getSigner()
-  //       setCurProvider(provider)
-  // setCurProvider(provider);
-  // await handleGetAccount();
-  // const recp = await transferToken(
-  // 	provider,
-  // 	"0",
-  // 	ERC20_TOKEN_ADDRESSES.goerliETH
-  // );
-  // console.log(recp);
-  // await axios
-  // 	.post("http://localhost:4000/wallet/test", {
-  // 		signer: JSON.stringify(signer.provider),
-  // 	})
-  // 	.then(function (response) {
-  // 		console.log(response);
-  // 	})
-  // 	.catch(function (error) {
-  // 		console.log(error);
-  // 	});
-  // setDefaultAccount(await signer.getAddress());
-  // const signer2 = new Wallet(provider)
-  // await accountChangedHandler(await provider.getSigner());
-  //     })
-  //   } else {
-  //     console.log('Please Install Metamask!!!')
-  //   }
-  // }
 
   return (
     <Box
@@ -82,11 +40,6 @@ const AppBarContent = (props: Props) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between'
-
-        // top: 0,
-        // position: 'fixed',
-        // zIndex: 500
-        // backgroundColor: '#c0c0c0'
       }}
     >
       <Box className='actions-left' sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>

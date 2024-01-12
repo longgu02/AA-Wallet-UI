@@ -20,18 +20,26 @@ import { useAppSelector } from 'src/redux/hooks'
 import { formatAddress } from 'src/utils'
 import Link from 'next/link'
 import { getNetworkInfo } from 'src/constant/chain'
-import { BrowserProvider, ethers } from 'ethers'
+import { Eip1193Provider, ethers } from 'ethers'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { updateWallet } from 'src/redux/connection/walletSlice'
+import { getAccountAddress } from 'src/utils/userOp'
+import { updateAccountAddress, updateAccountBalance } from 'src/redux/connection/accountSlice'
+import useNotify from 'src/hooks/useNotify'
+
+declare global {
+  interface Window {
+    ethereum?: Eip1193Provider
+  }
+}
 
 export default function ConnectWalletButton() {
   // ** Hooks
-  // const [provider, setProvider] = useState<BrowserProvider>()
   const [isLoading, setLoading] = useState<boolean>(false)
   const [isOpen, setOpen] = useState<boolean>(false)
   const [isCopied, setCopy] = useState<boolean>(false)
-  const [curProvider, setCurProvider] = useState<BrowserProvider>()
+  const { errorNotify } = useNotify()
 
   // Redux
   const { chainId, address, signer, balance } = useAppSelector((state: any) => state.wallet)
@@ -45,25 +53,35 @@ export default function ConnectWalletButton() {
   }
 
   const handleDisconnect = async () => {
-    // window.ethereum.removeListener("connect", _handleConnect);
-    // window.ethereum.removeListener("accountsChanged", _handleAccountChanged);
-    // window.ethereum.removeListener("disconnect", _handleDisconnect);
-    // window.ethereum.removeListener("chainChanged", _handleChainChanged);
-    // dispatch(removeWallet());
-    // removeSessionInfo();
+    return
   }
 
   const connect = async () => {
     if (window.ethereum) {
+      setLoading(true)
       const provider = new ethers.BrowserProvider(window.ethereum)
       provider.send('eth_requestAccounts', []).then(async accounts => {
         const accountBalance = await provider.getBalance(accounts[0])
         const network = await provider.getNetwork()
         const signer = await provider.getSigner()
-        
+
         console.log('provider', await provider.getSigner())
-        setCurProvider(provider)
-        
+        getAccountAddress(provider)
+          .then(res => {
+            dispatch(updateAccountAddress(res))
+            provider
+              .getBalance(res)
+              .then((res: BigInt) => {
+                dispatch(updateAccountBalance(res.toString()))
+              })
+              .catch((err: any) => {
+                console.log(err)
+              })
+          })
+          .catch(err => {
+            console.error(err)
+            errorNotify(err)
+          })
         dispatch(
           updateWallet({
             address: accounts[0],
@@ -80,9 +98,8 @@ export default function ConnectWalletButton() {
     } else {
       console.log('Please install Metamask!')
     }
+    setLoading(false)
   }
-
-  const authenticate = async () => {}
 
   return (
     <Box sx={{ margin: 2 }}>
@@ -137,9 +154,6 @@ export default function ConnectWalletButton() {
             <DialogActions sx={{ display: 'flex' }}>
               <Button variant='contained' color='error' sx={{ ml: 'auto', mr: 'auto' }} onClick={handleDisconnect}>
                 Disconnect
-              </Button>
-              <Button variant='contained' color='primary' sx={{ ml: 'auto', mr: 'auto' }} onClick={authenticate}>
-                Authenticate
               </Button>
             </DialogActions>
           </Box>
