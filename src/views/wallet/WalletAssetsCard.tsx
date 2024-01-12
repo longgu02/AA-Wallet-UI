@@ -47,8 +47,8 @@ const WalletAssetsCard = () => {
 
   return (
     <Card>
-      <CardContent sx={{ paddingTop: 4 }}>
-        <Typography variant='h6' sx={{ marginBottom: 5 }}>
+      <CardContent>
+        <Typography variant='h6' sx={{ marginBottom: 5, marginTop: 2 }}>
           Assets
         </Typography>
         <TableContainer sx={{ height: 440 }}>
