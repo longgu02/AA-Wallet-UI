@@ -8,33 +8,41 @@ const rpcUrl = 'https://api.stackup.sh/v1/node/6149257d4d56204640fd8ca4ed940fa4b
 const paymasterUrl =
   'https://api.stackup.sh/v1/paymaster/6149257d4d56204640fd8ca4ed940fa4bbfbd716784a3c40e0ab74811515e8ac'
 
-export const createApproveAndTransferCall = async (
+export const createApproveCall = async (to: string, value: string, erc20: Contract) => {
+  return {
+    to: to,
+    value: parseEther(value),
+    data: await erc20.interface.encodeFunctionData('approve', [to, parseUnits(value)])
+  }
+}
+
+export const createTransferCall = async (to: string, value: string, erc20: Contract) => {
+  return {
+    to: to,
+    value: parseEther(value),
+    data: await erc20.interface.encodeFunctionData('transfer', [to, parseUnits(value)])
+  }
+}
+
+export const createApproveAndTransferCalls = async (
   provider: BrowserProvider,
-  value: string,
-  to: string,
+  requests: Array<{ to: string; value: string }>,
   erc20TokenAddress: string
 ) => {
-  const erc20 = new Contract(erc20TokenAddress, ERC20_ABI, provider)
+  const userOps: Array<ICall> = []
+  const erc20: Contract = new Contract(erc20TokenAddress, ERC20_ABI, provider)
 
-  // const decimals = await Promise.all([erc20.decimals()]);
-  const amount = parseUnits(value)
-  const approve = {
-    to: to,
-    value: parseEther(value),
+  await requests.map(async item => {
+    const approve = await createApproveCall(item.to, item.value, erc20)
+    const transfer = await createTransferCall(item.to, item.value, erc20)
+    userOps.push(approve)
+    userOps.push(transfer)
+    console.log(userOps)
 
-    // value: ethers.toBigInt(amount),
-    // data: '0x'
-    data: erc20.interface.encodeFunctionData('approve', [to, amount])
-  }
-  const send = {
-    to: to,
-    // value: ethers.toBigInt(amount),
-    value: parseEther(value),
-    // data: '0x'
-    data: erc20.interface.encodeFunctionData('transfer', [to, amount])
-  }
+    return
+  })
 
-  return [approve, send]
+  return userOps
 }
 
 export const transferToken = async (provider: BrowserProvider, calls: Array<ICall>, feeToken: string) => {

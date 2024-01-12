@@ -12,7 +12,7 @@ import {
 } from '@mui/material'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
 import { useEffect, useState } from 'react'
-import { createApproveAndTransferCall, getBalance, transferToken } from 'src/utils/userOp'
+import { createApproveAndTransferCalls, getBalance, transferToken } from 'src/utils/userOp'
 import { useSelector } from 'react-redux'
 import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
 import { client } from 'src/services/client'
@@ -20,6 +20,7 @@ import useNotify from 'src/hooks/useNotify'
 import { useImmer } from 'use-immer'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import ClearIcon from '@mui/icons-material/Clear'
+import { ICall } from 'userop'
 
 const ETHIconUrl = 'https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Ethereum-ETH-icon.png'
 
@@ -78,14 +79,11 @@ const TransactionPad = (props: {
 }
 
 const WalletTransactionCard = () => {
-  const [amount, setAmount] = useState<string>('')
-  const [to, setTo] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const [transactionData, updateTransactionData] = useImmer([
     { amount: '', to: '', feeToken: '' },
     { amount: '', to: '', feeToken: '' }
   ])
-  const [feeToken, setFeeToken] = useState<string>('')
 
   const { provider } = useSelector((state: any) => state.wallet)
   const { successNotify, errorNotify } = useNotify()
@@ -101,15 +99,19 @@ const WalletTransactionCard = () => {
   const handleRemoveTransaction = (index: number) => {
     updateTransactionData(draft => void draft.splice(index, 1))
   }
-
-  console.log(transactionData)
   const handleSendTransaction = async () => {
     console.log('handleSendTransaction')
     setLoading(true)
     try {
-      const calls = await createApproveAndTransferCall(provider, amount, to, ERC20_TOKEN_ADDRESSES.goerliETH)
-
-      await transferToken(provider, calls, feeToken)
+      const requests: Array<{ to: string; value: string }> = []
+      console.log(transactionData)
+      transactionData.map(item => {
+        requests.push({ to: item.to, value: item.amount })
+      })
+      console.log(requests)
+      const calls = await createApproveAndTransferCalls(provider, requests, ERC20_TOKEN_ADDRESSES.goerliETH)
+      console.log(calls)
+      await transferToken(provider, calls, ERC20_TOKEN_ADDRESSES['6test'])
 
       // const data = await getBalance(provider, '0xa10cf1b64fafcd75ed18a905f96408f38f570fa6')
       // console.log(data)
