@@ -1,3 +1,7 @@
+// ** React
+import { useState } from 'react'
+
+// ** MUI
 import {
   Box,
   Card,
@@ -10,13 +14,20 @@ import {
   Select,
   MenuItem
 } from '@mui/material'
-import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
-import { useState } from 'react'
-import { createApproveAndTransferCalls, transferToken } from 'src/utils/userOp'
-import { useSelector } from 'react-redux'
+
+//** Constant */
 import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
-import useNotify from 'src/hooks/useNotify'
+
+//** Utils */
+import { createApproveAndTransferCalls, transferToken } from 'src/utils/userOp'
+
+// ** Hooks
 import { useImmer } from 'use-immer'
+import { useSelector } from 'react-redux'
+import useNotify from 'src/hooks/useNotify'
+
+// ** Icon
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import ClearIcon from '@mui/icons-material/Clear'
 
@@ -73,44 +84,42 @@ const TransactionPad = (props: {
   )
 }
 
-const WalletTransactionCard = () => {
-  const [loading, setLoading] = useState<boolean>(false)
-  const [transactionData, updateTransactionData] = useImmer([{ amount: '', to: '', feeToken: '' }])
+const INITIAL_STATE = { amount: '', to: '', feeToken: '' }
 
-  const { provider } = useSelector((state: any) => state.wallet)
+const WalletTransactionCard = () => {
+  // ** Hooks
+  const [loading, setLoading] = useState<boolean>(false)
+  const [transactionData, updateTransactionData] = useImmer([INITIAL_STATE])
   const { successNotify, errorNotify } = useNotify()
+
+  // ** Redux
+  const { provider } = useSelector((state: any) => state.wallet)
 
   const updateTransactionInput = (index: number, field: string, data: string) => {
     updateTransactionData(draft => void (draft[index] = { ...transactionData[index], [field]: data }))
   }
 
   const handleAddTransaction = () => {
-    updateTransactionData(draft => void draft.push({ amount: '', to: '', feeToken: '' }))
+    updateTransactionData(draft => void draft.push(INITIAL_STATE))
   }
 
   const handleRemoveTransaction = (index: number) => {
     updateTransactionData(draft => void draft.splice(index, 1))
   }
   const handleSendTransaction = async () => {
-    console.log('handleSendTransaction')
     setLoading(true)
     try {
       const requests: Array<{ to: string; value: string }> = []
-      console.log(transactionData)
       transactionData.map(item => {
         requests.push({ to: item.to, value: item.amount })
       })
-      console.log(requests)
       const calls = await createApproveAndTransferCalls(provider, requests, ERC20_TOKEN_ADDRESSES.goerliETH)
-      console.log(calls)
       await transferToken(provider, calls, ERC20_TOKEN_ADDRESSES['6test'])
 
-      // const data = await getBalance(provider, '0xa10cf1b64fafcd75ed18a905f96408f38f570fa6')
-      // console.log(data)
       successNotify('Transaction completed!')
     } catch (err: any) {
       errorNotify(err.message)
-      console.log(err)
+      console.error(err)
     }
     setLoading(false)
   }
