@@ -19,27 +19,6 @@ interface Column {
 const columns: readonly Column[] = [
   { id: 'token', label: 'Token', minWidth: 170 },
   { id: 'balance', label: 'Balance', minWidth: 100 }
-  // {
-  //   id: 'population',
-  //   label: 'Population',
-  //   minWidth: 170,
-  //   align: 'right',
-  //   format: (value: number) => value.toLocaleString('en-US')
-  // },
-  // {
-  //   id: 'size',
-  //   label: 'Size\u00a0(km\u00b2)',
-  //   minWidth: 170,
-  //   align: 'right',
-  //   format: (value: number) => value.toLocaleString('en-US')
-  // },
-  // {
-  //   id: 'density',
-  //   label: 'Density',
-  //   minWidth: 170,
-  //   align: 'right',
-  //   format: (value: number) => value.toFixed(2)
-  // }
 ]
 
 interface Data {
@@ -86,12 +65,12 @@ const WalletAssetsCard = () => {
             <TableBody>
               {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => {
                 return (
-                  <TableRow hover role='checkbox' tabIndex={-1} key={row.code}>
-                    {columns.map(column => {
+                  <TableRow hover role='checkbox' tabIndex={-1} key={row.balance}>
+                    {columns.map((column, index) => {
                       const value = row[column.id]
 
                       return (
-                        <TableCell key={column.id} align={column.align}>
+                        <TableCell key={column.id + index} align={column.align}>
                           {column.format && typeof value === 'number' ? column.format(value) : value}
                         </TableCell>
                       )

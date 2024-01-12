@@ -11,16 +11,14 @@ import {
   MenuItem
 } from '@mui/material'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
-import { useEffect, useState } from 'react'
-import { createApproveAndTransferCalls, getBalance, transferToken } from 'src/utils/userOp'
+import { useState } from 'react'
+import { createApproveAndTransferCalls, transferToken } from 'src/utils/userOp'
 import { useSelector } from 'react-redux'
 import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
-import { client } from 'src/services/client'
 import useNotify from 'src/hooks/useNotify'
 import { useImmer } from 'use-immer'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import ClearIcon from '@mui/icons-material/Clear'
-import { ICall } from 'userop'
 
 const ETHIconUrl = 'https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Ethereum-ETH-icon.png'
 
@@ -30,9 +28,6 @@ const TransactionPad = (props: {
   updateInput: (index: number, field: string, data: string) => void
 }) => {
   const { index, data, updateInput } = props
-  const [amount, setAmount] = useState<string>('')
-  const [to, setTo] = useState<string>('')
-  const [feeToken, setFeeToken] = useState<string>('')
 
   return (
     <Box sx={{ marginBottom: 5 }}>
@@ -80,10 +75,7 @@ const TransactionPad = (props: {
 
 const WalletTransactionCard = () => {
   const [loading, setLoading] = useState<boolean>(false)
-  const [transactionData, updateTransactionData] = useImmer([
-    { amount: '', to: '', feeToken: '' },
-    { amount: '', to: '', feeToken: '' }
-  ])
+  const [transactionData, updateTransactionData] = useImmer([{ amount: '', to: '', feeToken: '' }])
 
   const { provider } = useSelector((state: any) => state.wallet)
   const { successNotify, errorNotify } = useNotify()

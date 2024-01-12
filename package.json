@@ -1,32 +1,24 @@
 {
-  "name": "AA-UI",
+  "name": "AA-Wallet-UI",
   "description": "Account Abstraction User Interface 🚀",
   "license": "MIT",
   "version": "1.0.0",
   "author": "Long Pham (https://github.com/longgu02)",
   "bugs": {
-    "url": "https://github.com/themeselection/materio-mui-react-nextjs-admin-template-free/issues"
+    "url": "https://github.com/longgu02/AA-Wallet-UI/issues"
   },
   "private": false,
-  "repository": "https://github.com/themeselection/materio-mui-react-nextjs-admin-template-free.git",
+  "repository": "https://github.com/longgu02/AA-Wallet-UI.git",
   "keywords": [
     "react",
-    "javascript",
     "admin",
     "typescript",
     "dashboard",
     "material-design",
     "nextjs",
     "material-ui",
-    "admin-dashboard",
-    "free",
     "mui",
-    "admin-template",
-    "admin-panel",
-    "freebies",
-    "nextjs-template",
-    "react-dashboard",
-    "themeselection"
+    "account abstraction"
   ],
   "scripts": {
     "dev": "next dev",
