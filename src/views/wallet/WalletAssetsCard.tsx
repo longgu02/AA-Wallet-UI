@@ -1,5 +1,5 @@
-import { Card, CardContent, Typography } from '@mui/material'
-import { useState, ChangeEvent } from 'react'
+import { Card, CardContent, CircularProgress, Typography } from '@mui/material'
+import { useState, ChangeEvent, useEffect } from 'react'
 import Table from '@mui/material/Table'
 import TableRow from '@mui/material/TableRow'
 import TableHead from '@mui/material/TableHead'
@@ -7,6 +7,10 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
+import { fetchAllBalance } from 'src/utils/userOp'
+import { useSelector } from 'react-redux'
+import { useImmer } from 'use-immer'
+import { formatEther } from 'ethers'
 
 interface Column {
   id: 'token' | 'balance'
@@ -30,11 +34,13 @@ function createData(token: string, balance: string): Data {
   return { token, balance }
 }
 
-const rows = [createData('Goerli ETH', '0.015'), createData('USDC', '0.015'), createData('6TEST', '0.015')]
-
 const WalletAssetsCard = () => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
+  const { provider } = useSelector((state: any) => state.wallet)
+  const [isLoading, setLoading] = useState<boolean>(false)
+  const { accountAddress } = useSelector((state: any) => state.account)
+  const [rows, updateRows] = useImmer<Array<Data>>([])
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
@@ -45,23 +51,17 @@ const WalletAssetsCard = () => {
     setPage(0)
   }
 
-  return (
-    <Card>
-      <CardContent>
-        <Typography variant='h6' sx={{ marginBottom: 5, marginTop: 2 }}>
-          Assets
-        </Typography>
-        <TableContainer sx={{ height: 440 }}>
-          <Table stickyHeader aria-label='sticky table'>
-            <TableHead>
-              <TableRow>
-                {columns.map(column => (
-                  <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
+  const genTableBody = () => {
+    if (provider) {
+      if (accountAddress) {
+        if (isLoading) {
+          return (
+            <CircularProgress
+              sx={{ position: 'absolute', top: '50%', left: '45%', transform: 'translate(-50%, -50%)' }}
+            />
+          )
+        } else {
+          return (
             <TableBody>
               {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => {
                 return (
@@ -79,6 +79,57 @@ const WalletAssetsCard = () => {
                 )
               })}
             </TableBody>
+          )
+        }
+      } else {
+        return <Typography>Please sign to get your account</Typography>
+      }
+    } else {
+      return <Typography>Connect to your wallet</Typography>
+    }
+  }
+
+  useEffect(() => {
+    if (provider) {
+      if (accountAddress) {
+        setLoading(true)
+        fetchAllBalance(provider, accountAddress)
+          .then((res: any) => {
+            updateRows([])
+            Object.keys(res).map((token: any) => {
+              updateRows(draft => void draft.push(createData(token.toUpperCase(), formatEther(res[token]))))
+            })
+            console.log(res)
+            setLoading(false)
+          })
+          .catch(err => {
+            console.log(err)
+            setLoading(false)
+          })
+      } else {
+      }
+    } else {
+    }
+  }, [provider, accountAddress])
+
+  return (
+    <Card sx={{ position: 'relative', opacity: isLoading ? 0.7 : 1, cursor: 'progress' }}>
+      <CardContent>
+        <Typography variant='h6' sx={{ marginBottom: 5, marginTop: 2 }}>
+          Assets
+        </Typography>
+        <TableContainer sx={{ height: 440 }}>
+          <Table stickyHeader aria-label='sticky table'>
+            <TableHead>
+              <TableRow>
+                {columns.map(column => (
+                  <TableCell key={column.id} align={column.align} sx={{ minWidth: column.minWidth }}>
+                    {column.label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            {genTableBody()}
           </Table>
         </TableContainer>
         <TablePagination

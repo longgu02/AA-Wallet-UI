@@ -30,7 +30,7 @@ import useNotify from 'src/hooks/useNotify'
 
 declare global {
   interface Window {
-    ethereum?: Eip1193Provider
+    ethereum?: Eip1193Provider | any
   }
 }
 
@@ -53,7 +53,16 @@ export default function ConnectWalletButton() {
   }
 
   const handleDisconnect = async () => {
-    return
+    dispatch(
+      updateWallet({
+        address: '',
+        chainId: undefined,
+        provider: undefined,
+        signer: undefined,
+        balance: 0,
+        isAdmin: false
+      })
+    )
   }
 
   const connect = async () => {
@@ -95,6 +104,8 @@ export default function ConnectWalletButton() {
 
         // const signer = await provider.getSigner()
       })
+
+      // window.ethereum.on('disconnect', handleDisconect)
     } else {
       console.log('Please install Metamask!')
     }

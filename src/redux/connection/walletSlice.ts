@@ -4,7 +4,7 @@ import { BrowserProvider, JsonRpcSigner } from 'ethers'
 
 export type WalletState = {
   address: string
-  chainId: number
+  chainId?: number
   provider?: BrowserProvider
   signer?: JsonRpcSigner
   balance?: number

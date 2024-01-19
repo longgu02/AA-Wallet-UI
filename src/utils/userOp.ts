@@ -1,5 +1,6 @@
 import { BrowserProvider, Contract, parseEther, parseUnits } from 'ethers'
 import { ERC20_ABI } from 'src/constant/abis/erc20Abi'
+import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
 import { Client, ICall, Presets } from 'userop'
 
 const rpcUrl = 'https://api.stackup.sh/v1/node/6149257d4d56204640fd8ca4ed940fa4bbfbd716784a3c40e0ab74811515e8ac'
@@ -51,9 +52,8 @@ export const createApproveAndTransferCalls = async (
 }
 
 export const transferToken = async (provider: BrowserProvider, calls: Array<ICall>, feeToken: string) => {
-  console.log('transfer', provider, calls, feeToken)
   const paymasterMiddleware = Presets.Middleware.verifyingPaymaster(paymasterUrl, {
-    type: 'payg',
+    type: 'erc20token',
     token: feeToken
   })
 
@@ -68,12 +68,20 @@ export const transferToken = async (provider: BrowserProvider, calls: Array<ICal
       onBuild: op => console.log('Signed UserOperation', op)
     }
   )
-  console.log(`UserOpHash: ${res.userOpHash}`)
-  console.log(`Waiting for transaction...`)
-  const ev = await res.wait()
-  console.log(`Transaction hash: ${ev?.transactionHash ?? null}`)
+
+  // const ev = await res.wait()
 }
 
-export const getBalance = async (provider: BrowserProvider, address: string) => {
-  return await provider.getBalance(address)
+export const getBalance = async (provider: BrowserProvider, erc20TokenAddress: string, address: string) => {
+  const tokenContract = new Contract(erc20TokenAddress, ERC20_ABI, provider)
+  const balance = await tokenContract.balanceOf(address)
+
+  return balance
+}
+
+export const fetchAllBalance = async (provider: BrowserProvider, address: string) => {
+  const usdcBalance = await getBalance(provider, ERC20_TOKEN_ADDRESSES.usdc, address)
+  const testBalance = await getBalance(provider, ERC20_TOKEN_ADDRESSES['6test'], address)
+
+  return { usdc: usdcBalance, ['6test']: testBalance }
 }
