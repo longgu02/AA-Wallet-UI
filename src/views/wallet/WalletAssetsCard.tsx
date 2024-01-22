@@ -7,10 +7,12 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
-import { fetchAllBalance } from 'src/utils/userOp'
+import { fetchAllBalance } from 'src/utils/connection'
 import { useSelector } from 'react-redux'
-import { useImmer } from 'use-immer'
+import { Updater, useImmer } from 'use-immer'
 import { formatEther } from 'ethers'
+import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
+import { INITIAL_STATE } from './WalletTransactionCard'
 
 interface Column {
   id: 'token' | 'balance'
@@ -34,14 +36,16 @@ function createData(token: string, balance: string): Data {
   return { token, balance }
 }
 
-const WalletAssetsCard = () => {
+const WalletAssetsCard = (props: {
+  updateTransactionData: Updater<{ amount: string; to: string; feeToken: string; token: string }[]>
+}) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const { provider } = useSelector((state: any) => state.wallet)
   const [isLoading, setLoading] = useState<boolean>(false)
   const { accountAddress } = useSelector((state: any) => state.account)
   const [rows, updateRows] = useImmer<Array<Data>>([])
-
+  const { updateTransactionData } = props
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
   }
@@ -65,7 +69,19 @@ const WalletAssetsCard = () => {
             <TableBody>
               {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => {
                 return (
-                  <TableRow hover role='checkbox' tabIndex={-1} key={row.balance}>
+                  <TableRow
+                    hover
+                    role='checkbox'
+                    tabIndex={-1}
+                    key={row.balance}
+                    onClick={() =>
+                      handleClickToken(
+                        row.token != 'ETH'
+                          ? ERC20_TOKEN_ADDRESSES[row.token.toLowerCase() as keyof typeof ERC20_TOKEN_ADDRESSES]
+                          : 'native'
+                      )
+                    }
+                  >
                     {columns.map((column, index) => {
                       const value = row[column.id]
 
@@ -87,6 +103,11 @@ const WalletAssetsCard = () => {
     } else {
       return <Typography>Connect to your wallet</Typography>
     }
+  }
+
+  const handleClickToken = (token: string) => {
+    console.log(token)
+    updateTransactionData(draft => void draft.push({ ...INITIAL_STATE, token: token }))
   }
 
   useEffect(() => {

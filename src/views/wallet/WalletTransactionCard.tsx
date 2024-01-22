@@ -19,10 +19,10 @@ import {
 import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
 
 //** Utils
-import { createApproveAndTransferCalls, transferToken } from 'src/utils/userOp'
+import { createCalls, createTransferNativeCalls, executeCalls } from 'src/utils/userOp'
 
 //** Hooks
-import { useImmer } from 'use-immer'
+import { Updater } from 'use-immer'
 import { useSelector } from 'react-redux'
 import useNotify from 'src/hooks/useNotify'
 
@@ -32,13 +32,33 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import ClearIcon from '@mui/icons-material/Clear'
 
 const ETHIconUrl = 'https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Ethereum-ETH-icon.png'
+const emptyTokenIconUrl = 'https://sepolia.etherscan.io/images/main/empty-token.png'
 
 const TransactionPad = (props: {
   index: number
-  data: { amount: string; to: string; feeToken: string }
+  data: { amount: string; to: string; feeToken: string; token: string }
   updateInput: (index: number, field: string, data: string) => void
 }) => {
   const { index, data, updateInput } = props
+
+  const renderTokenIcon = (token?: string) => {
+    switch (token) {
+      case 'native':
+        return (
+          <>
+            <img src={ETHIconUrl} width={40} height={40} alt='GoerliETH' />
+            <Typography>SepoliaETH</Typography>
+          </>
+        )
+      default:
+        return (
+          <>
+            <img src={emptyTokenIconUrl} width={40} height={40} alt='GoerliETH' />
+            <Typography>{token?.toUpperCase()}</Typography>
+          </>
+        )
+    }
+  }
 
   return (
     <Box sx={{ marginBottom: 5 }}>
@@ -54,8 +74,13 @@ const TransactionPad = (props: {
           />
         </Grid>
         <Grid item xs={3} sx={{ textAlign: 'center' }}>
-          <img src={ETHIconUrl} width={40} height={40} alt='GoerliETH' />
-          <Typography>GoerliETH</Typography>
+          {renderTokenIcon(
+            data.token == 'native'
+              ? 'native'
+              : Object.keys(ERC20_TOKEN_ADDRESSES).find(
+                  key => ERC20_TOKEN_ADDRESSES[key as keyof typeof ERC20_TOKEN_ADDRESSES] === data.token
+                )
+          )}
         </Grid>
       </Grid>
       <Box sx={{ flexWrap: 'wrap', display: 'flex', justifyContent: 'space-between' }}>
@@ -74,13 +99,21 @@ const TransactionPad = (props: {
   )
 }
 
-const INITIAL_STATE = { amount: '', to: '', feeToken: '' }
+export const INITIAL_STATE = { amount: '', to: '', token: 'native', feeToken: '' }
 
-const WalletTransactionCard = () => {
+const WalletTransactionCard = (props: {
+  updateTransactionData: Updater<{ amount: string; to: string; feeToken: string; token: string }[]>
+  transactionData: {
+    amount: string
+    to: string
+    feeToken: string
+    token: string
+  }[]
+}) => {
   //** Hooks
   const [loading, setLoading] = useState<boolean>(false)
   const [feeToken, setFeeToken] = useState<string>(ERC20_TOKEN_ADDRESSES['6test'])
-  const [transactionData, updateTransactionData] = useImmer([INITIAL_STATE])
+  const { transactionData, updateTransactionData } = props
   const { successNotify, errorNotify } = useNotify()
 
   //** Redux
@@ -101,12 +134,13 @@ const WalletTransactionCard = () => {
   const handleSendTransaction = async () => {
     setLoading(true)
     try {
-      const requests: Array<{ to: string; value: string }> = []
+      const requests: Array<{ to: string; value: string; tokenAddress: string }> = []
+      console.log(transactionData)
       transactionData.map(item => {
-        requests.push({ to: item.to, value: item.amount })
+        requests.push({ to: item.to, value: item.amount, tokenAddress: item.token })
       })
-      const calls = await createApproveAndTransferCalls(provider, requests, ERC20_TOKEN_ADDRESSES.goerliETH)
-      await transferToken(provider, calls, ERC20_TOKEN_ADDRESSES['6test'])
+      const calls = await createCalls(provider, requests)
+      await executeCalls(provider, calls, ERC20_TOKEN_ADDRESSES['6test'])
 
       successNotify('Transaction completed!')
     } catch (err: any) {
