@@ -9,6 +9,11 @@ export type AccountState = {
 const initialState: AccountState = {
   accountAddress: '',
   accountBalance: undefined
+
+  // assets: Array<{
+  //   symbol: string,
+  //   balance: string
+  // }>
 }
 
 export const accountSlice = createSlice({

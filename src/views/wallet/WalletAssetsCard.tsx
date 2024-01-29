@@ -131,7 +131,7 @@ const WalletAssetsCard = (props: {
       }
     } else {
     }
-  }, [provider, accountAddress])
+  }, [provider, accountAddress, updateRows])
 
   return (
     <Card sx={{ position: 'relative', opacity: isLoading ? 0.7 : 1, cursor: 'progress' }}>

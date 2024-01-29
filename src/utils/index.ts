@@ -1,9 +1,8 @@
-import { BrowserProvider, JsonRpcProvider, JsonRpcSigner, ethers } from 'ethers'
-// import { Status } from "../types";
+import { BrowserProvider, JsonRpcSigner } from 'ethers'
 
 export const formatAddress: (arg0: string, arg1: number) => string | undefined = (
   address: string,
-  fractionDigits: number = 3
+  fractionDigits = 3
 ) => {
   try {
     return address.slice(0, fractionDigits) + '...' + address.slice(-fractionDigits)
@@ -18,6 +17,7 @@ export const storeJWT = (address: string, jwt: string) => {
 
 export const getStoredJWT = (address: string) => {
   const jwt = localStorage.getItem(address)
+
   return jwt
 }
 
@@ -28,6 +28,7 @@ export const storeSession = (provider: BrowserProvider, signer: JsonRpcSigner) =
 
 export const getSessionInfo = (provider: BrowserProvider) => {
   const signer = sessionStorage.getItem('metamaskSigner')
+
   return {
     signer: signer ? new JsonRpcSigner(provider, JSON.parse(signer).address) : undefined
   }
@@ -45,9 +46,11 @@ export const getNonce = () => {
   let _to = 3
   Array(len1)
     .fill(0)
-    .forEach(_ => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .forEach((_: any) => {
       return (_to = _to * random(2, 10))
     })
+
   return random(2, _to)
 }
 
@@ -80,6 +83,7 @@ export function isTokenExpired(token: string) {
 
   const { exp } = JSON.parse(jsonPayload)
   const expired = Date.now() >= exp * 1000
+
   return expired
 }
 

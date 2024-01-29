@@ -19,7 +19,7 @@ import {
 import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
 
 //** Utils
-import { createCalls, createTransferNativeCalls, executeCalls } from 'src/utils/userOp'
+import { createCalls, executeCalls } from 'src/utils/userOp'
 
 //** Hooks
 import { Updater } from 'use-immer'

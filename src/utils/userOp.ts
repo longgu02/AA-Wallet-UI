@@ -1,4 +1,4 @@
-import { BrowserProvider, Contract, parseEther, parseUnits } from 'ethers'
+import { BrowserProvider, Contract, parseEther } from 'ethers'
 import { ERC20_ABI } from 'src/constant/abis/erc20Abi'
 import { Client, ICall, Presets } from 'userop'
 
@@ -8,7 +8,7 @@ const paymasterUrl =
 
 export const getAccountAddress = async (provider: BrowserProvider) => {
   console.log(provider)
-  const builder = await Presets.Builder.Kernel.init(await provider.getSigner(), rpcUrl)
+  const builder = await Presets.Builder.Kernel.init((await provider.getSigner()) as any, rpcUrl)
   const address = await builder.getSender()
 
   return address
@@ -85,7 +85,9 @@ export const executeCalls = async (provider: BrowserProvider, calls: Array<ICall
   })
 
   // Sign here
-  const builder = await Presets.Builder.Kernel.init(await provider.getSigner(), rpcUrl, { paymasterMiddleware })
+  const builder = await Presets.Builder.Kernel.init((await provider.getSigner()) as any, rpcUrl, {
+    paymasterMiddleware
+  })
   const client = await Client.init(rpcUrl)
 
   // Sign here
