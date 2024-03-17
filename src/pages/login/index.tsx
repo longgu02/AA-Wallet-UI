@@ -38,6 +38,10 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 
 // ** Demo Imports
 import FooterIllustrationsV1 from 'src/views/pages/auth/FooterIllustration'
+import { client } from 'src/services/client'
+import { storeJWT } from 'src/utils'
+import { useDispatch } from 'react-redux'
+import { addAccount } from 'src/redux/connection/accountSlice'
 
 interface State {
   password: string
@@ -68,7 +72,8 @@ const LoginPage = () => {
     password: '',
     showPassword: false
   })
-
+  const [email, setEmail] = useState<string>('')
+  const dispatch = useDispatch()
   // ** Hook
   const theme = useTheme()
   const router = useRouter()
@@ -169,7 +174,17 @@ const LoginPage = () => {
             <Typography variant='body2'>Please sign-in to your account and start the adventure</Typography>
           </Box>
           <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
-            <TextField autoFocus fullWidth id='email' label='Email' sx={{ marginBottom: 4 }} />
+            <TextField
+              autoFocus
+              fullWidth
+              id='email'
+              label='Email'
+              value={email}
+              onChange={e => {
+                setEmail(e.target.value)
+              }}
+              sx={{ marginBottom: 4 }}
+            />
             <FormControl fullWidth>
               <InputLabel htmlFor='auth-login-password'>Password</InputLabel>
               <OutlinedInput
@@ -205,7 +220,19 @@ const LoginPage = () => {
               size='large'
               variant='contained'
               sx={{ marginBottom: 7 }}
-              onClick={() => router.push('/')}
+              onClick={() => {
+                client
+                  .post('/auth/log-in', { email: email, password: values.password })
+                  .then(res => {
+                    console.log(res)
+                    dispatch(addAccount({ address: res.address, logger: email }))
+                    storeJWT(res.jwt)
+                    router.push('/')
+                  })
+                  .catch(err => {
+                    console.log(err)
+                  })
+              }}
             >
               Login
             </Button>

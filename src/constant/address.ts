@@ -19,6 +19,10 @@ export const ADDRESS = {
   }
 }
 
+export const AF_ADDRESS = '0x0b3b4d0F8348A65D5Ba0bc365f640B8Ff9baf31F'
+export const EP_ADDRESS = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789'
+export const PM_ADDRESS = '0xD0ea240F7e207c4A9866952ce3bAE9E35Df01e2b'
+
 export const getNetworkAddress = (chainId: number) => {
   if (chainId == -1) {
     return ADDRESS.GOERLI_TESTNET

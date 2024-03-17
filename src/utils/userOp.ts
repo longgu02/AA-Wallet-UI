@@ -1,5 +1,7 @@
 import { BrowserProvider, Contract, parseEther } from 'ethers'
 import { ERC20_ABI } from 'src/constant/abis/erc20Abi'
+
+// import { AF_ADDRESS, EP_ADDRESS, PM_ADDRESS } from 'src/constant/address'
 import { Client, ICall, Presets } from 'userop'
 
 const rpcUrl = 'https://api.stackup.sh/v1/node/6c329f2e1b005e3e456b00c8e627486477b6c60e2c234d4e028ad30b370d5508'
@@ -13,6 +15,62 @@ export const getAccountAddress = async (provider: BrowserProvider) => {
 
   return address
 }
+
+// export const createUserOp = async () => {
+//   const entryPoint = new Contract()
+
+//   let initCode = AF_ADDRESS + AccountFactory.interface.encodeFunctionData('createAccount', [address0]).slice(2)
+
+//   let sender: any
+
+//   try {
+//     await entryPoint.getSenderAddress(initCode)
+//   } catch (ex: any) {
+//     // Local
+//     // sender = "0x" + ex.data.data.slice(-40);
+//     // Testnet
+//     sender = '0x' + ex.data.slice(-40)
+//   }
+
+//   console.log({ sender })
+
+//   const code = await ethers.provider.getCode(sender)
+//   if (code !== '0x') {
+//     initCode = '0x'
+//   }
+
+//   const userOp: UserOp = {
+//     sender, // smart account address
+//     nonce: '0x' + (await entryPoint.getNonce(sender, 0)).toString(16),
+//     initCode,
+//     // callData: Account.interface.encodeFunctionData("execute"),
+//     callData: Account.interface.encodeFunctionData('sendEther', [
+//       '0xF6f94b71bbdc4716dc138A04593a7fb0504F3e43',
+//       ethers.parseEther('0.002')
+//     ]),
+//     paymasterAndData: PM_ADDRESS,
+//     signature:
+//       '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c'
+//   }
+
+//   const { preVerificationGas, verificationGasLimit, callGasLimit } = await ethers.provider.send(
+//     'eth_estimateUserOperationGas',
+//     [userOp, EP_ADDRESS]
+//   )
+
+//   userOp.preVerificationGas = preVerificationGas
+//   userOp.verificationGasLimit = verificationGasLimit
+//   userOp.callGasLimit = callGasLimit
+
+//   const { maxFeePerGas } = await ethers.provider.getFeeData()
+//   userOp.maxFeePerGas = '0x' + maxFeePerGas?.toString(16)
+
+//   const maxPriorityFeePerGas = await ethers.provider.send('rundler_maxPriorityFeePerGas')
+//   userOp.maxPriorityFeePerGas = maxPriorityFeePerGas
+
+//   const userOpHash = await entryPoint.getUserOpHash(userOp)
+//   userOp.signature = await signer0.signMessage(ethers.getBytes(userOpHash))
+// }
 
 export const createApproveCall = async (to: string, value: string, erc20TokenAddress: string, erc20: Contract) => {
   return {

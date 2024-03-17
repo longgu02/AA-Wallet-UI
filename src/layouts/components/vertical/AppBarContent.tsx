@@ -18,6 +18,7 @@ import ModeToggler from 'src/@core/layouts/components/shared-components/ModeTogg
 import UserDropdown from 'src/@core/layouts/components/shared-components/UserDropdown'
 import NotificationDropdown from 'src/@core/layouts/components/shared-components/NotificationDropdown'
 import ConnectWalletButton from '../connection/ConnectWalletButton'
+import ConnectAccountBox from '../connection/ConnectAccountBox'
 
 interface Props {
   hidden: boolean
@@ -65,19 +66,8 @@ const AppBarContent = (props: Props) => {
         />
       </Box>
       <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
-        {/* <Button variant='contained' sx={{ margin: 3 }}>
-          Connect Wallet
-        </Button> */}
-        <ConnectWalletButton />
-        {/* {connectors.map((connector) => (
-    <button key={connector.uid} onClick={() => connect({ connector })}>
-      {connector.name}
-    </button>)} */}
-        {/* {connectors.map(connector => (
-          <button key={connector.uid} onClick={() => connect({ connector })}>
-            {connector.name}
-          </button>
-        ))} */}
+        <ConnectAccountBox />
+        {/* <ConnectWalletButton /> */}
         <ModeToggler settings={settings} saveSettings={saveSettings} />
         <NotificationDropdown />
         <UserDropdown />

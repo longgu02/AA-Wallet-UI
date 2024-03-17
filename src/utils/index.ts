@@ -11,14 +11,48 @@ export const formatAddress: (arg0: string, arg1: number) => string | undefined =
   }
 }
 
-export const storeJWT = (address: string, jwt: string) => {
-  localStorage.setItem(address, jwt)
+// export const storeJWT = (address: string, jwt: string) => {
+//   localStorage.setItem(address, jwt)
+// }
+
+// export const getStoredJWT = (address: string) => {
+//   const jwt = localStorage.getItem(address)
+
+//   return jwt
+// }
+
+export const storeJWT = (jwt: string) => {
+  localStorage.setItem('accessToken', jwt)
 }
 
-export const getStoredJWT = (address: string) => {
-  const jwt = localStorage.getItem(address)
+export const getJWT = () => {
+  localStorage.getItem('accessToken')
+}
 
-  return jwt
+export const selectAccount = (
+  accounts: Array<{
+    address: string
+    isSelected: boolean
+    logger: string
+  }>,
+  addressToSelect: string
+) => {
+  // Unselect the currently selected account
+  accounts.forEach(account => {
+    if (account.isSelected) {
+      account.isSelected = false
+    }
+  })
+
+  // Select the account with the given address
+  const accountToSelect = accounts.find(account => account.address === addressToSelect)
+  if (accountToSelect) {
+    accountToSelect.isSelected = true
+  } else {
+    console.log(`No account found with the address ${addressToSelect}`)
+  }
+
+  return accounts
 }
 
 export const storeSession = (provider: BrowserProvider, signer: JsonRpcSigner) => {

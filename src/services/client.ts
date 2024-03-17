@@ -17,4 +17,4 @@ export const nextClient = createClient('')
 
 export const testClient = createClient('http://localhost:3001')
 
-export const client = createClient('http://localhost:4000')
+export const client = createClient('http://localhost:6868')

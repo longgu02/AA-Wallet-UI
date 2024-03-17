@@ -4,6 +4,8 @@ import Box, { BoxProps } from '@mui/material/Box'
 
 // ** Types
 import { BlankLayoutProps } from './types'
+import { Provider } from 'react-redux'
+import { store } from 'src/redux/store'
 
 // Styled component for Blank Layout component
 const BlankLayoutWrapper = styled(Box)<BoxProps>(({ theme }) => ({
@@ -29,11 +31,13 @@ const BlankLayoutWrapper = styled(Box)<BoxProps>(({ theme }) => ({
 
 const BlankLayout = ({ children }: BlankLayoutProps) => {
   return (
-    <BlankLayoutWrapper className='layout-wrapper'>
-      <Box className='app-content' sx={{ minHeight: '100vh', overflowX: 'hidden', position: 'relative' }}>
-        {children}
-      </Box>
-    </BlankLayoutWrapper>
+    <Provider store={store}>
+      <BlankLayoutWrapper className='layout-wrapper'>
+        <Box className='app-content' sx={{ minHeight: '100vh', overflowX: 'hidden', position: 'relative' }}>
+          {children}
+        </Box>
+      </BlankLayoutWrapper>
+    </Provider>
   )
 }
 

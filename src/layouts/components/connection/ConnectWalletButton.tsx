@@ -9,6 +9,7 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemButton,
   Tooltip,
   Typography
 } from '@mui/material'
@@ -27,6 +28,9 @@ import { updateWallet } from 'src/redux/connection/walletSlice'
 import { getAccountAddress } from 'src/utils/userOp'
 import { updateAccountAddress, updateAccountBalance } from 'src/redux/connection/accountSlice'
 import useNotify from 'src/hooks/useNotify'
+import MailOutlineIcon from '@mui/icons-material/MailOutline'
+import { useRouter } from 'next/router'
+import AddIcon from '@mui/icons-material/Add'
 
 declare global {
   interface Window {
@@ -40,9 +44,11 @@ export default function ConnectWalletButton() {
   const [isOpen, setOpen] = useState<boolean>(false)
   const [isCopied, setCopy] = useState<boolean>(false)
   const { errorNotify } = useNotify()
+  const router = useRouter()
 
   // Redux
   const { chainId, address, signer, balance } = useAppSelector((state: any) => state.wallet)
+  const { accounts } = useAppSelector((state: any) => state.account)
   const dispatch = useDispatch()
 
   const handleOpen = () => setOpen(true)
@@ -63,6 +69,11 @@ export default function ConnectWalletButton() {
         isAdmin: false
       })
     )
+  }
+
+  const getCurSelectedAccount = () => {
+    const selectedAccount = accounts.find((account: any) => account.isSelected == true)
+    if (selectedAccount) return selectedAccount.address
   }
 
   const connect = async () => {
@@ -113,14 +124,14 @@ export default function ConnectWalletButton() {
   }
 
   return (
-    <Box sx={{ margin: 2 }}>
-      <Button variant='contained' disableElevation color='primary' disabled={isLoading} onClick={handleOpen}>
+    <Box sx={{ margin: 2, width: '100%' }}>
+      <Button variant='contained' fullWidth disableElevation color='primary' disabled={isLoading} onClick={handleOpen}>
         {isLoading ? (
           <CircularProgress size={30} color='inherit' />
         ) : (
           <>
-            <AccountBalanceWalletOutlinedIcon sx={{ mr: 1 }} />
-            {address ? formatAddress(address, 5) : 'Connect Wallet'}
+            <AddIcon sx={{ mr: 1 }} />
+            {getCurSelectedAccount() ? 'Add Account' : 'Connect Wallet'}
           </>
         )}
       </Button>
@@ -179,12 +190,11 @@ export default function ConnectWalletButton() {
             >
               <Typography variant='h5'>Choose Wallet</Typography>
 
-              <Typography>Safely connect to your existing blockchain wallet.</Typography>
+              <Typography>Safely connect to your existing blockchain wallet or email.</Typography>
             </DialogTitle>
             <DialogContent sx={{ mt: 2 }}>
               <List disablePadding={true} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <ListItem
-                  button
+                <ListItemButton
                   onClick={() => connect()}
                   sx={{
                     display: 'flex',
@@ -202,10 +212,9 @@ export default function ConnectWalletButton() {
                   <Typography noWrap variant='subtitle2'>
                     Metamask
                   </Typography>
-                </ListItem>
+                </ListItemButton>
 
-                <ListItem
-                  disabled
+                <ListItemButton
                   sx={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -213,16 +222,20 @@ export default function ConnectWalletButton() {
                     width: 180,
                     height: 120
                   }}
+                  onClick={() => {
+                    router.push('/login')
+                  }}
                 >
-                  <img
+                  {/* <img
                     src='https://1000logos.net/wp-content/uploads/2022/05/WalletConnect-Logo.png'
                     alt='metamask'
                     style={{ height: 80, width: 80, objectFit: 'contain' }}
-                  />
+                  /> */}
+                  <MailOutlineIcon sx={{ height: 80, width: 80, objectFit: 'contain' }} />
                   <Typography noWrap variant='subtitle2'>
-                    Wallet Connect
+                    Email
                   </Typography>
-                </ListItem>
+                </ListItemButton>
               </List>
             </DialogContent>
           </Box>
