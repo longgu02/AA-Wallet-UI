@@ -10,9 +10,10 @@ export const getBalance = async (provider: BrowserProvider, erc20TokenAddress: s
 }
 
 export const fetchAllBalance = async (provider: BrowserProvider, address: string) => {
-  const weenusBalance = await getBalance(provider, ERC20_TOKEN_ADDRESSES.weenus, address)
-  const testBalance = await getBalance(provider, ERC20_TOKEN_ADDRESSES['6test'], address)
-  const nativeBalance = await provider.getBalance('0xAd97db8126589D4001895035216D1977fC0cE49d')
+  // const weenusBalance = await getBalance(provider, ERC20_TOKEN_ADDRESSES.weenus, address)
+  // const testBalance = await getBalance(provider, ERC20_TOKEN_ADDRESSES['6test'], address)
+  const nativeBalance = await provider.getBalance(address)
 
-  return { ETH: nativeBalance, weenus: weenusBalance, ['6test']: testBalance }
+  // return { ETH: nativeBalance, weenus: weenusBalance, ['6test']: testBalance }
+  return { ETH: nativeBalance }
 }

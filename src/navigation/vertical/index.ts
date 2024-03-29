@@ -40,9 +40,9 @@ const navigation = (): VerticalNavItemsType => {
     //   // openInNewTab: true
     // },
     {
-      title: 'Transfer',
+      title: 'Wallet',
       icon: AccountBalanceWalletIcon,
-      path: '/wallet/transfer'
+      path: '/wallet'
     },
 
     {

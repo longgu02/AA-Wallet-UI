@@ -101,7 +101,7 @@ const TransactionPad = (props: {
 
 export const INITIAL_STATE = { amount: '', to: '', token: 'native', feeToken: '' }
 
-const WalletTransactionCard = (props: {
+const TransactionCard = (props: {
   updateTransactionData: Updater<{ amount: string; to: string; feeToken: string; token: string }[]>
   transactionData: {
     amount: string
@@ -196,4 +196,4 @@ const WalletTransactionCard = (props: {
   )
 }
 
-export default WalletTransactionCard
+export default TransactionCard

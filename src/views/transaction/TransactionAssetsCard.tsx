@@ -9,10 +9,10 @@ import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
 import { fetchAllBalance } from 'src/utils/connection'
 import { useSelector } from 'react-redux'
-import { useImmer } from 'use-immer'
-import { JsonRpcProvider, formatEther } from 'ethers'
+import { Updater, useImmer } from 'use-immer'
+import { formatEther } from 'ethers'
 import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
-import TablePaper from 'src/components/table-paper'
+import { INITIAL_STATE } from './TransactionCard'
 
 interface Column {
   id: 'token' | 'balance'
@@ -36,14 +36,16 @@ function createData(token: string, balance: string): Data {
   return { token, balance }
 }
 
-const WalletAssetsCard = () => {
+const TransactionAssetsCard = (props: {
+  updateTransactionData: Updater<{ amount: string; to: string; feeToken: string; token: string }[]>
+}) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
-  const [rpcProvider, setRpcProvider] = useState<JsonRpcProvider | undefined>()
   const { provider } = useSelector((state: any) => state.wallet)
   const [isLoading, setLoading] = useState<boolean>(false)
-  const { accounts } = useSelector((state: any) => state.account)
+  const { accountAddress } = useSelector((state: any) => state.account)
   const [rows, updateRows] = useImmer<Array<Data>>([])
+  const { updateTransactionData } = props
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage)
   }
@@ -54,8 +56,8 @@ const WalletAssetsCard = () => {
   }
 
   const genTableBody = () => {
-    if (provider || rpcProvider) {
-      if (accounts.length > 0) {
+    if (provider) {
+      if (accountAddress) {
         if (isLoading) {
           return (
             <CircularProgress
@@ -99,19 +101,20 @@ const WalletAssetsCard = () => {
         return <Typography>Please sign to get your account</Typography>
       }
     } else {
-      return <Typography>Please sign to get your account</Typography>
+      return <Typography>Connect to your wallet</Typography>
     }
   }
 
   const handleClickToken = (token: string) => {
     console.log(token)
+    updateTransactionData(draft => void draft.push({ ...INITIAL_STATE, token: token }))
   }
 
   useEffect(() => {
-    if (provider || rpcProvider) {
-      if (accounts.find(acc => acc.isSelected == true).address) {
+    if (provider) {
+      if (accountAddress) {
         setLoading(true)
-        fetchAllBalance(provider ? provider : rpcProvider, accounts.find(acc => acc.isSelected == true).address)
+        fetchAllBalance(provider, accountAddress)
           .then((res: any) => {
             updateRows([])
             Object.keys(res).map((token: any) => {
@@ -127,9 +130,8 @@ const WalletAssetsCard = () => {
       } else {
       }
     } else {
-      setRpcProvider(new JsonRpcProvider('http://localhost:8545'))
     }
-  }, [provider, accounts, updateRows])
+  }, [provider, accountAddress, updateRows])
 
   return (
     <Card sx={{ position: 'relative', opacity: isLoading ? 0.7 : 1, cursor: 'progress' }}>
@@ -137,8 +139,7 @@ const WalletAssetsCard = () => {
         <Typography variant='h6' sx={{ marginBottom: 5, marginTop: 2 }}>
           Assets
         </Typography>
-        <TablePaper />
-        {/* <TableContainer sx={{ height: 440 }}>
+        <TableContainer sx={{ height: 440 }}>
           <Table stickyHeader aria-label='sticky table'>
             <TableHead>
               <TableRow>
@@ -160,10 +161,10 @@ const WalletAssetsCard = () => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-        /> */}
+        />
       </CardContent>
     </Card>
   )
 }
 
-export default WalletAssetsCard
+export default TransactionAssetsCard

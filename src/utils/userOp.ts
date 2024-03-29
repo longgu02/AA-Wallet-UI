@@ -1,5 +1,9 @@
-import { BrowserProvider, Contract, parseEther } from 'ethers'
 import { ERC20_ABI } from 'src/constant/abis/erc20Abi'
+import { Contract, ContractFactory, JsonRpcProvider, ethers, BrowserProvider, parseEther } from 'ethers'
+import { accountAbi } from 'src/constant/abis/abis/accountAbi'
+import { entryPointAbi } from 'src/constant/abis/abis/entryPointAbi'
+import { EP_ADDRESS, PM_ADDRESS } from 'src/constant/addresses'
+import { UserOp } from 'src/types/interfaces'
 
 // import { AF_ADDRESS, EP_ADDRESS, PM_ADDRESS } from 'src/constant/address'
 import { Client, ICall, Presets } from 'userop'
@@ -158,4 +162,58 @@ export const executeCalls = async (provider: BrowserProvider, calls: Array<ICall
   const ev = await res.wait()
 
   console.log(ev)
+}
+
+export const fillUserOp = async (
+  sender: string,
+  Account: ContractFactory,
+  entryPoint: Contract,
+  initCode: string,
+  callData: {
+    receiver: string
+    amount: bigint
+    data: string
+  }
+) => {
+  // const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY
+
+  // const bundler = new JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`)
+
+  // Get addresses
+
+  // const epAddress: string = EP_ADDRESS
+  const pmAddress: string = PM_ADDRESS
+
+  // Fill user operation
+  const userOp: UserOp = {
+    sender, // smart account address
+    nonce: '0x' + (await entryPoint.getNonce(sender, 0)).toString(16),
+    initCode,
+    callData: Account.interface.encodeFunctionData('execute', [callData.receiver, callData.amount, callData.data]),
+    paymasterAndData: pmAddress,
+    signature:
+      '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c'
+  }
+
+  // const { preVerificationGas, verificationGasLimit, callGasLimit } = await bundler.send(
+  //   'eth_estimateUserOperationGas',
+  //   [userOp, epAddress]
+  // )
+
+  // userOp.preVerificationGas = preVerificationGas
+  // userOp.verificationGasLimit = verificationGasLimit
+  // userOp.callGasLimit = callGasLimit
+  userOp.preVerificationGas = 900_000 * 4
+  userOp.verificationGasLimit = 900_000 * 4
+  userOp.callGasLimit = 900_000 * 4
+
+  // const { maxFeePerGas } = await bundler.getFeeData()
+  // userOp.maxFeePerGas = '0x' + maxFeePerGas?.toString(16)
+  userOp.maxFeePerGas = ethers.parseUnits('100', 'gwei')
+
+  // const maxPriorityFeePerGas = await bundler.send('rundler_maxPriorityFeePerGas', [])
+  // userOp.maxPriorityFeePerGas = maxPriorityFeePerGas
+  userOp.maxPriorityFeePerGas = ethers.parseUnits('50', 'gwei')
+
+  return { userOp: userOp, userOpHash: await entryPoint.getUserOpHash(userOp) }
 }

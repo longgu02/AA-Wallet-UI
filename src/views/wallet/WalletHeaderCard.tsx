@@ -1,10 +1,104 @@
 import { Box, Card, CardContent, Grid, Typography } from '@mui/material'
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
-import { formatEther } from 'ethers'
+import { JsonRpcProvider, formatEther } from 'ethers'
 import { useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
+import * as Highcharts from 'highcharts'
+import HighchartsReact from 'highcharts-react-official'
 
 const WalletHeaderCard = () => {
-  const { accountAddress, accountBalance } = useSelector((state: any) => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
+  const [balance, setBalance] = useState<bigint | undefined>(undefined)
+
+  useEffect(() => {
+    const provider = new JsonRpcProvider('http://localhost:8545')
+
+    provider
+      .getBalance(accounts.find(acc => acc.isSelected == true).address)
+      .then(balance => {
+        setBalance(balance)
+        console.log(balance)
+      })
+      .catch(err => console.error(err))
+  }, [accounts])
+
+  // const renderBalance = () => {
+  // const chart = new Chart({
+  //   chart: {
+  //     type: 'pie',
+  //     renderTo: 'atmospheric-composition'
+  //   },
+  //   title: {
+  //     verticalAlign: 'middle',
+  //     floating: true,
+  //     text: "Earth's Atmospheric Composition",
+  //     style: {
+  //       fontSize: '10px'
+  //     }
+  //   },
+  //   plotOptions: {
+  //     pie: {
+  //       dataLabels: {
+  //         format: '{point.name}: {point.percentage:.1f} %'
+  //       },
+  //       innerSize: '70%'
+  //     }
+  //   }
+  // })
+  //   return chart
+  // }
+  const options = {
+    credits: {
+      enabled: false
+    },
+    chart: {
+      type: 'pie',
+      renderTo: 'atmospheric-composition',
+      width: 440, // width of the chart
+      height: 250, // height of the chart
+      backgroundColor: '#312D4B'
+    },
+    title: {
+      verticalAlign: 'middle',
+      align: 'center',
+      floating: true,
+      text: `$${balance && formatEther(balance)}`,
+      style: {
+        color: '#ffffff',
+        fontSize: '24px'
+      },
+      x: -54
+    },
+    plotOptions: {
+      pie: {
+        dataLabels: {
+          enabled: false
+        },
+        innerSize: '90%', // Makes the pie chart thinner
+        showInLegend: true
+      }
+    },
+    legend: {
+      layout: 'vertical',
+      align: 'right',
+      verticalAlign: 'middle',
+      itemStyle: {
+        color: '#ffffff' // Change this to the color you want
+      }
+    },
+    series: [
+      {
+        name: 'Balance',
+        data: [
+          {
+            name: 'Ethereum',
+            y: balance && Number(formatEther(balance)),
+            color: '#3498db'
+          }
+        ]
+      }
+    ]
+  }
 
   return (
     <Card sx={{ marginBottom: 4 }}>
@@ -19,9 +113,10 @@ const WalletHeaderCard = () => {
             marginLeft: 5
           }}
         >
-          <AccountBalanceWalletIcon sx={{ fontSize: 100, color: '#C3B1E1', marginTop: 'auto', marginBottom: 'auto' }} />
+          {/* <AccountBalanceWalletIcon sx={{ fontSize: 100, color: '#C3B1E1', marginTop: 'auto', marginBottom: 'auto' }} /> */}
+          <HighchartsReact highcharts={Highcharts} options={options} />
         </CardContent>
-        <Grid
+        {/* <Grid
           item
           xs={12}
           md={7}
@@ -32,16 +127,16 @@ const WalletHeaderCard = () => {
         >
           <CardContent>
             <Typography variant='h6' sx={{ marginBottom: 2 }}>
-              {accountAddress ? accountAddress : 'Connect to your wallet!'}
+              {accounts.length != 0 ? accounts.find(acc => acc.isSelected == true).address : 'Connect to your wallet!'}
             </Typography>
             <Typography sx={{ fontWeight: 500, marginBottom: 3 }}>
               Balance:{' '}
               <Box component='span' sx={{ fontWeight: 'bold' }}>
-                {accountBalance ? formatEther(accountBalance.toString()) : 'X'} ETH
+                {balance != undefined ? formatEther(balance) : 'X'} ETH
               </Box>
             </Typography>
           </CardContent>
-        </Grid>
+        </Grid> */}
       </Grid>
     </Card>
   )
