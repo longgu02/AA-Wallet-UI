@@ -1,5 +1,14 @@
 import { ERC20_ABI } from 'src/constant/abis/erc20Abi'
-import { Contract, ContractFactory, JsonRpcProvider, ethers, BrowserProvider, parseEther, Wallet } from 'ethers'
+import {
+  Contract,
+  ContractFactory,
+  JsonRpcProvider,
+  ethers,
+  BrowserProvider,
+  parseEther,
+  Wallet,
+  AbiCoder
+} from 'ethers'
 import { UserOp } from 'src/types/interfaces'
 
 // import { AF_ADDRESS, EP_ADDRESS, PM_ADDRESS } from 'src/constant/address'
@@ -8,6 +17,7 @@ import { accountAbi, accountByteCode } from 'src/constant/abis/accountAbi'
 import { AF_ADDRESS, ECDSASM_ADDRESS, EP_ADDRESS, PM_ADDRESS } from 'src/constant/address'
 import { AF_BYTECODE, accountFactoryAbi } from 'src/constant/abis/accountFactory'
 import { entryPointAbi } from 'src/constant/abis/entryPointAbi'
+import { client } from 'src/services/client'
 
 const rpcUrl = 'https://api.stackup.sh/v1/node/6c329f2e1b005e3e456b00c8e627486477b6c60e2c234d4e028ad30b370d5508'
 const paymasterUrl =
@@ -98,6 +108,7 @@ export const createCalls = async (
 }
 
 export const executeCalls = async (
+  sender: string,
   publicKey: string,
   logger: string,
   provider: BrowserProvider | JsonRpcProvider,
@@ -108,7 +119,8 @@ export const executeCalls = async (
       data: string
     }
   ],
-  feeToken: string
+  feeToken: string,
+  password?: string
 ) => {
   // const paymasterMiddleware = Presets.Middleware.verifyingPaymaster(paymasterUrl, {
   //   type: 'payg',
@@ -116,7 +128,7 @@ export const executeCalls = async (
   // })
   const bundler = new JsonRpcProvider('http://localhost:8545')
   const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
-
+  const defaultAbi = AbiCoder.defaultAbiCoder()
   const wallet = new Wallet(privateKey)
   const signer = wallet.connect(bundler)
 
@@ -124,40 +136,60 @@ export const executeCalls = async (
   const AccountFactory = new ContractFactory(accountFactoryAbi, AF_BYTECODE, bundler)
   const Account = new ContractFactory(accountAbi, accountByteCode, bundler)
 
-  let sender: any
-
   // Calculate address from the entry point
 
   let initCode =
     AF_ADDRESS +
     AccountFactory.interface.encodeFunctionData('createAccount', [publicKey, ECDSASM_ADDRESS, EP_ADDRESS]).slice(2)
 
-  try {
-    await entryPoint.getSenderAddress(initCode)
-  } catch (ex: any) {
-    // Local
-    // console.log(ex)
-    // sender = '0x' + ex.data.data.slice(-40)
+  // try {
+  //   await entryPoint.getSenderAddress(initCode)
+  // } catch (ex: any) {
+  //   // Local
+  //   // console.log(ex)
+  //   // sender = '0x' + ex.data.data.slice(-40)
 
-    // Testnet
-    sender = '0x' + ex.data.slice(-40)
+  //   // Testnet
+  //   sender = '0x' + ex.data.slice(-40)
 
-    // console.log(ex);
-  }
-  console.log({ sender })
+  //   // console.log(ex);
+  // }
+  // console.log({ sender })
   const code = await bundler.getCode(sender)
   if (code !== '0x') {
     initCode = '0x'
   }
 
   const { userOp, userOpHash } = await fillUserOp(sender, Account, entryPoint, initCode, calls)
-  console.log({ userOp, userOpHash })
 
-  if (logger != 'eoa') {
+  if (logger == 'eoa') {
     // Sign the userOp
   } else {
     // Sign the userOp
+    await client
+      .post('/account/sign-message', {
+        email: logger,
+        password: password,
+        message: userOpHash.toString()
+      })
+      .then(response => {
+        console.log({ response })
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
+
+  userOp.signature = defaultAbi.encode(
+    ['bytes', 'address'],
+    [await signer.signMessage(ethers.getBytes(userOpHash)), ECDSASM_ADDRESS]
+  )
+
+  console.log({ userOp, userOpHash })
+
+  const tx = await entryPoint.handleOps([userOp], publicKey)
+  const receipt = await tx.wait()
+  console.log(receipt)
 
   // Sign here
   // const builder = await Presets.Builder.Kernel.init((await provider.getSigner()) as any, rpcUrl, {
@@ -202,6 +234,7 @@ export const fillUserOp = async (
   let receivers: string[] | string
   let amounts: bigint[] | bigint
   let datas: string[] | string
+  let callData: string
 
   if (callDatas.length > 1) {
     receivers = []
@@ -212,18 +245,22 @@ export const fillUserOp = async (
       ;(amounts as bigint[]).push(callData.amount)
       ;(datas as string[]).push(callData.data)
     })
+    callData = Account.interface.encodeFunctionData('executeBatch', [receivers, amounts, datas])
   } else {
     receivers = callDatas[0].receiver
     amounts = callDatas[0].amount
     datas = callDatas[0].data
+    callData = Account.interface.encodeFunctionData('execute', [receivers, amounts, datas])
   }
+
+  console.log([receivers, amounts, datas])
 
   // Fill user operation
   const userOp: UserOp = {
     sender, // smart account address
     nonce: '0x' + (await entryPoint.getNonce(sender, 0)).toString(16),
     initCode,
-    callData: Account.interface.encodeFunctionData('execute', [receivers, amounts, datas]),
+    callData,
     paymasterAndData: pmAddress,
     signature:
       '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c'

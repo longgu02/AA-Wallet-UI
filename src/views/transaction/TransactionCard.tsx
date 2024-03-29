@@ -12,7 +12,12 @@ import {
   IconButton,
   CircularProgress,
   Select,
-  MenuItem
+  MenuItem,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material'
 
 //** Constant
@@ -116,6 +121,9 @@ const TransactionCard = (props: {
   const { transactionData, updateTransactionData } = props
   const { successNotify, errorNotify } = useNotify()
   const { accounts } = useSelector((state: any) => state.account)
+  const [open, setOpen] = useState<boolean>(false)
+  const [password, setPassword] = useState<string>('')
+  const [otp, setOtp] = useState<string>('')
 
   //** Redux
   const { provider } = useSelector((state: any) => state.wallet)
@@ -142,11 +150,13 @@ const TransactionCard = (props: {
       })
       const calls = await createCalls(provider, requests)
       await executeCalls(
+        accounts.find((acc: any) => acc.isSelected).address,
         '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
         accounts.find((acc: any) => acc.isSelected == true).logger,
         provider,
         calls,
-        ERC20_TOKEN_ADDRESSES['6test']
+        ERC20_TOKEN_ADDRESSES['6test'],
+        password
       )
 
       successNotify('Transaction completed!')
@@ -157,49 +167,101 @@ const TransactionCard = (props: {
     setLoading(false)
   }
 
+  const handleOpen = () => {
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const handleExecute = () => {
+    // Handle the execution logic here
+    console.log('Password:', password)
+    console.log('OTP:', otp)
+    handleClose()
+  }
+
   return (
-    <Card sx={{ position: 'relative', opacity: loading ? 0.7 : 1, cursor: 'progress' }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant='h6' sx={{ marginTop: 'auto', marginBottom: 'auto' }}>
-            Send transaction
-          </Typography>
-          {!loading ? (
-            <IconButton sx={{ display: 'flex' }} onClick={handleSendTransaction}>
-              <DoubleArrowIcon sx={{ fontSize: 30 }} />
-            </IconButton>
-          ) : (
-            <CircularProgress
-              sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
-            />
-          )}
-        </Box>
-        {/* <Typography sx={{ marginBottom: 2 }}>Fee Token</Typography> */}
-        <Select placeholder='Fee Token' value={feeToken} fullWidth onChange={event => setFeeToken(event.target.value)}>
-          <MenuItem value={ERC20_TOKEN_ADDRESSES['6test']} defaultChecked>
-            6TEST
-          </MenuItem>
-          <MenuItem value={ERC20_TOKEN_ADDRESSES.usdc}>USDC</MenuItem>
-        </Select>
-        {transactionData &&
-          transactionData.map((data, index) => (
-            <Box key={index}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography sx={{ fontWeight: 'bold', marginTop: 'auto', marginBottom: 'auto' }}>
-                  Transaction {index + 1}:
-                </Typography>
-                <IconButton sx={{ display: 'flex' }} onClick={() => handleRemoveTransaction(index)}>
-                  <ClearIcon sx={{ fontSize: 30, margin: 'auto' }} />
-                </IconButton>
+    <>
+      <Card sx={{ position: 'relative', opacity: loading ? 0.7 : 1, cursor: loading ? 'progress' : 'auto' }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant='h6' sx={{ marginTop: 'auto', marginBottom: 'auto' }}>
+              Send transaction
+            </Typography>
+            {!loading ? (
+              <IconButton sx={{ display: 'flex' }} onClick={handleOpen}>
+                <DoubleArrowIcon sx={{ fontSize: 30 }} />
+              </IconButton>
+            ) : (
+              <CircularProgress
+                sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+              />
+            )}
+          </Box>
+          {/* <Typography sx={{ marginBottom: 2 }}>Fee Token</Typography> */}
+          <Select
+            placeholder='Fee Token'
+            value={feeToken}
+            fullWidth
+            onChange={event => setFeeToken(event.target.value)}
+          >
+            <MenuItem value={ERC20_TOKEN_ADDRESSES['6test']} defaultChecked>
+              6TEST
+            </MenuItem>
+            <MenuItem value={ERC20_TOKEN_ADDRESSES.usdc}>USDC</MenuItem>
+          </Select>
+          {transactionData &&
+            transactionData.map((data, index) => (
+              <Box key={index}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography sx={{ fontWeight: 'bold', marginTop: 'auto', marginBottom: 'auto' }}>
+                    Transaction {index + 1}:
+                  </Typography>
+                  <IconButton sx={{ display: 'flex' }} onClick={() => handleRemoveTransaction(index)}>
+                    <ClearIcon sx={{ fontSize: 30, margin: 'auto' }} />
+                  </IconButton>
+                </Box>
+                <TransactionPad updateInput={updateTransactionInput} index={index} data={data} />
               </Box>
-              <TransactionPad updateInput={updateTransactionInput} index={index} data={data} />
-            </Box>
-          ))}
-        <IconButton sx={{ display: 'flex', margin: '20px auto 0 auto' }} onClick={handleAddTransaction}>
-          <AddCircleOutlineIcon sx={{ fontSize: 50, margin: 'auto' }} />
-        </IconButton>
-      </CardContent>
-    </Card>
+            ))}
+          <IconButton sx={{ display: 'flex', margin: '20px auto 0 auto' }} onClick={handleAddTransaction}>
+            <AddCircleOutlineIcon sx={{ fontSize: 50, margin: 'auto' }} />
+          </IconButton>
+        </CardContent>
+      </Card>
+      <div>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Enter your details</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin='dense'
+              label='Password'
+              type='password'
+              fullWidth
+              variant='standard'
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+            <TextField
+              margin='dense'
+              label='OTP'
+              type='text'
+              fullWidth
+              variant='standard'
+              value={otp}
+              onChange={e => setOtp(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleSendTransaction}>Execute</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    </>
   )
 }
 

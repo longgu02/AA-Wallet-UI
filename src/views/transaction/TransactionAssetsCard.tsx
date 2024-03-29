@@ -133,10 +133,10 @@ const TransactionAssetsCard = (props: {
     } else {
       setRpcProvider(new JsonRpcProvider('http://localhost:8545'))
     }
-  }, [provider, accounts, updateRows])
+  }, [provider, accounts, updateRows, rpcProvider])
 
   return (
-    <Card sx={{ position: 'relative', opacity: isLoading ? 0.7 : 1, cursor: 'progress' }}>
+    <Card sx={{ position: 'relative', opacity: isLoading ? 0.7 : 1, cursor: isLoading ? 'progress' : 'auto' }}>
       <CardContent>
         <Typography variant='h6' sx={{ marginBottom: 5, marginTop: 2 }}>
           Assets
