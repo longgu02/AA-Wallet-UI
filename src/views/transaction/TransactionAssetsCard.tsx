@@ -10,7 +10,7 @@ import TablePagination from '@mui/material/TablePagination'
 import { fetchAllBalance } from 'src/utils/connection'
 import { useSelector } from 'react-redux'
 import { Updater, useImmer } from 'use-immer'
-import { formatEther } from 'ethers'
+import { JsonRpcProvider, formatEther } from 'ethers'
 import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
 import { INITIAL_STATE } from './TransactionCard'
 
@@ -41,9 +41,10 @@ const TransactionAssetsCard = (props: {
 }) => {
   const [page, setPage] = useState<number>(0)
   const [rowsPerPage, setRowsPerPage] = useState<number>(10)
+  const [rpcProvider, setRpcProvider] = useState<JsonRpcProvider | undefined>()
   const { provider } = useSelector((state: any) => state.wallet)
   const [isLoading, setLoading] = useState<boolean>(false)
-  const { accountAddress } = useSelector((state: any) => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
   const [rows, updateRows] = useImmer<Array<Data>>([])
   const { updateTransactionData } = props
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -56,8 +57,8 @@ const TransactionAssetsCard = (props: {
   }
 
   const genTableBody = () => {
-    if (provider) {
-      if (accountAddress) {
+    if (provider || rpcProvider) {
+      if (accounts.length > 0) {
         if (isLoading) {
           return (
             <CircularProgress
@@ -101,7 +102,7 @@ const TransactionAssetsCard = (props: {
         return <Typography>Please sign to get your account</Typography>
       }
     } else {
-      return <Typography>Connect to your wallet</Typography>
+      return <Typography>Connecting to your wallet...</Typography>
     }
   }
 
@@ -111,10 +112,10 @@ const TransactionAssetsCard = (props: {
   }
 
   useEffect(() => {
-    if (provider) {
-      if (accountAddress) {
+    if (provider || rpcProvider) {
+      if (accounts.find(acc => acc.isSelected == true).address) {
         setLoading(true)
-        fetchAllBalance(provider, accountAddress)
+        fetchAllBalance(provider ? provider : rpcProvider, accounts.find(acc => acc.isSelected == true).address)
           .then((res: any) => {
             updateRows([])
             Object.keys(res).map((token: any) => {
@@ -130,8 +131,9 @@ const TransactionAssetsCard = (props: {
       } else {
       }
     } else {
+      setRpcProvider(new JsonRpcProvider('http://localhost:8545'))
     }
-  }, [provider, accountAddress, updateRows])
+  }, [provider, accounts, updateRows])
 
   return (
     <Card sx={{ position: 'relative', opacity: isLoading ? 0.7 : 1, cursor: 'progress' }}>

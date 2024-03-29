@@ -1,5 +1,4 @@
-import { Box, Card, CardContent, Grid, Typography } from '@mui/material'
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
+import { Card, CardContent, Grid } from '@mui/material'
 import { JsonRpcProvider, formatEther } from 'ethers'
 import { useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
@@ -14,7 +13,7 @@ const WalletHeaderCard = () => {
     const provider = new JsonRpcProvider('http://localhost:8545')
 
     provider
-      .getBalance(accounts.find(acc => acc.isSelected == true).address)
+      .getBalance(accounts.find((acc: any) => acc.isSelected == true).address)
       .then(balance => {
         setBalance(balance)
         console.log(balance)
@@ -22,31 +21,6 @@ const WalletHeaderCard = () => {
       .catch(err => console.error(err))
   }, [accounts])
 
-  // const renderBalance = () => {
-  // const chart = new Chart({
-  //   chart: {
-  //     type: 'pie',
-  //     renderTo: 'atmospheric-composition'
-  //   },
-  //   title: {
-  //     verticalAlign: 'middle',
-  //     floating: true,
-  //     text: "Earth's Atmospheric Composition",
-  //     style: {
-  //       fontSize: '10px'
-  //     }
-  //   },
-  //   plotOptions: {
-  //     pie: {
-  //       dataLabels: {
-  //         format: '{point.name}: {point.percentage:.1f} %'
-  //       },
-  //       innerSize: '70%'
-  //     }
-  //   }
-  // })
-  //   return chart
-  // }
   const options = {
     credits: {
       enabled: false

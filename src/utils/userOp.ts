@@ -1,12 +1,13 @@
 import { ERC20_ABI } from 'src/constant/abis/erc20Abi'
-import { Contract, ContractFactory, JsonRpcProvider, ethers, BrowserProvider, parseEther } from 'ethers'
-import { accountAbi } from 'src/constant/abis/abis/accountAbi'
-import { entryPointAbi } from 'src/constant/abis/abis/entryPointAbi'
-import { EP_ADDRESS, PM_ADDRESS } from 'src/constant/addresses'
+import { Contract, ContractFactory, JsonRpcProvider, ethers, BrowserProvider, parseEther, Wallet } from 'ethers'
 import { UserOp } from 'src/types/interfaces'
 
 // import { AF_ADDRESS, EP_ADDRESS, PM_ADDRESS } from 'src/constant/address'
 import { Client, ICall, Presets } from 'userop'
+import { accountAbi, accountByteCode } from 'src/constant/abis/accountAbi'
+import { AF_ADDRESS, ECDSASM_ADDRESS, EP_ADDRESS, PM_ADDRESS } from 'src/constant/address'
+import { AF_BYTECODE, accountFactoryAbi } from 'src/constant/abis/accountFactory'
+import { entryPointAbi } from 'src/constant/abis/entryPointAbi'
 
 const rpcUrl = 'https://api.stackup.sh/v1/node/6c329f2e1b005e3e456b00c8e627486477b6c60e2c234d4e028ad30b370d5508'
 const paymasterUrl =
@@ -20,74 +21,18 @@ export const getAccountAddress = async (provider: BrowserProvider) => {
   return address
 }
 
-// export const createUserOp = async () => {
-//   const entryPoint = new Contract()
-
-//   let initCode = AF_ADDRESS + AccountFactory.interface.encodeFunctionData('createAccount', [address0]).slice(2)
-
-//   let sender: any
-
-//   try {
-//     await entryPoint.getSenderAddress(initCode)
-//   } catch (ex: any) {
-//     // Local
-//     // sender = "0x" + ex.data.data.slice(-40);
-//     // Testnet
-//     sender = '0x' + ex.data.slice(-40)
-//   }
-
-//   console.log({ sender })
-
-//   const code = await ethers.provider.getCode(sender)
-//   if (code !== '0x') {
-//     initCode = '0x'
-//   }
-
-//   const userOp: UserOp = {
-//     sender, // smart account address
-//     nonce: '0x' + (await entryPoint.getNonce(sender, 0)).toString(16),
-//     initCode,
-//     // callData: Account.interface.encodeFunctionData("execute"),
-//     callData: Account.interface.encodeFunctionData('sendEther', [
-//       '0xF6f94b71bbdc4716dc138A04593a7fb0504F3e43',
-//       ethers.parseEther('0.002')
-//     ]),
-//     paymasterAndData: PM_ADDRESS,
-//     signature:
-//       '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c'
-//   }
-
-//   const { preVerificationGas, verificationGasLimit, callGasLimit } = await ethers.provider.send(
-//     'eth_estimateUserOperationGas',
-//     [userOp, EP_ADDRESS]
-//   )
-
-//   userOp.preVerificationGas = preVerificationGas
-//   userOp.verificationGasLimit = verificationGasLimit
-//   userOp.callGasLimit = callGasLimit
-
-//   const { maxFeePerGas } = await ethers.provider.getFeeData()
-//   userOp.maxFeePerGas = '0x' + maxFeePerGas?.toString(16)
-
-//   const maxPriorityFeePerGas = await ethers.provider.send('rundler_maxPriorityFeePerGas')
-//   userOp.maxPriorityFeePerGas = maxPriorityFeePerGas
-
-//   const userOpHash = await entryPoint.getUserOpHash(userOp)
-//   userOp.signature = await signer0.signMessage(ethers.getBytes(userOpHash))
-// }
-
 export const createApproveCall = async (to: string, value: string, erc20TokenAddress: string, erc20: Contract) => {
   return {
-    to: erc20TokenAddress,
-    value: BigInt(0),
+    receiver: erc20TokenAddress,
+    amount: BigInt(0),
     data: await erc20.interface.encodeFunctionData('approve', [to, parseEther(value)])
   }
 }
 
 export const createTransferCall = async (to: string, value: string, erc20TokenAddress: string, erc20: Contract) => {
   return {
-    to: erc20TokenAddress,
-    value: BigInt(0),
+    receiver: erc20TokenAddress,
+    amount: BigInt(0),
     data: await erc20.interface.encodeFunctionData('transfer', [to, parseEther(value)])
   }
 }
@@ -98,7 +43,13 @@ export const createERC20TransferCalls = async (
   value: string,
   erc20TokenAddress: string
 ) => {
-  const userOps: Array<ICall> = []
+  const userOps: [
+    {
+      receiver: string
+      amount: bigint
+      data: string
+    }
+  ] = []
   const erc20: Contract = new Contract(erc20TokenAddress, ERC20_ABI, provider)
 
   const approve = await createApproveCall(to, value, erc20TokenAddress, erc20)
@@ -113,8 +64,8 @@ export const createERC20TransferCalls = async (
 export const createTransferNativeCalls = (to: string, value: string) => {
   // const approve = await createApproveCall(item.to, item.value, erc20)
   const transfer = {
-    to: to,
-    value: parseEther(value),
+    receiver: to,
+    amount: parseEther(value),
     data: '0x'
   }
 
@@ -125,7 +76,13 @@ export const createCalls = async (
   provider: BrowserProvider,
   requests: Array<{ to: string; value: string; tokenAddress?: string }>
 ) => {
-  let userOps: Array<ICall> = []
+  let userOps: [
+    {
+      receiver: string
+      amount: bigint
+      data: string
+    }
+  ] = []
   console.log(requests)
   for (const item of requests) {
     if (item.tokenAddress && item.tokenAddress != 'native') {
@@ -140,28 +97,84 @@ export const createCalls = async (
   return userOps
 }
 
-export const executeCalls = async (provider: BrowserProvider, calls: Array<ICall>, feeToken: string) => {
-  const paymasterMiddleware = Presets.Middleware.verifyingPaymaster(paymasterUrl, {
-    type: 'payg',
-    token: feeToken
-  })
-
-  // Sign here
-  const builder = await Presets.Builder.Kernel.init((await provider.getSigner()) as any, rpcUrl, {
-    paymasterMiddleware
-  })
-  const client = await Client.init(rpcUrl)
-
-  // Sign here
-  const res = await client.sendUserOperation(
-    calls.length === 1 ? builder.execute(calls[0]) : builder.executeBatch(calls),
+export const executeCalls = async (
+  publicKey: string,
+  logger: string,
+  provider: BrowserProvider | JsonRpcProvider,
+  calls: [
     {
-      onBuild: op => console.log('Signed UserOperation', op)
+      receiver: string
+      amount: bigint
+      data: string
     }
-  )
-  const ev = await res.wait()
+  ],
+  feeToken: string
+) => {
+  // const paymasterMiddleware = Presets.Middleware.verifyingPaymaster(paymasterUrl, {
+  //   type: 'payg',
+  //   token: feeToken
+  // })
+  const bundler = new JsonRpcProvider('http://localhost:8545')
+  const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
 
-  console.log(ev)
+  const wallet = new Wallet(privateKey)
+  const signer = wallet.connect(bundler)
+
+  const entryPoint = new Contract(EP_ADDRESS, entryPointAbi, signer)
+  const AccountFactory = new ContractFactory(accountFactoryAbi, AF_BYTECODE, bundler)
+  const Account = new ContractFactory(accountAbi, accountByteCode, bundler)
+
+  let sender: any
+
+  // Calculate address from the entry point
+
+  let initCode =
+    AF_ADDRESS +
+    AccountFactory.interface.encodeFunctionData('createAccount', [publicKey, ECDSASM_ADDRESS, EP_ADDRESS]).slice(2)
+
+  try {
+    await entryPoint.getSenderAddress(initCode)
+  } catch (ex: any) {
+    // Local
+    // console.log(ex)
+    // sender = '0x' + ex.data.data.slice(-40)
+
+    // Testnet
+    sender = '0x' + ex.data.slice(-40)
+
+    // console.log(ex);
+  }
+  console.log({ sender })
+  const code = await bundler.getCode(sender)
+  if (code !== '0x') {
+    initCode = '0x'
+  }
+
+  const { userOp, userOpHash } = await fillUserOp(sender, Account, entryPoint, initCode, calls)
+  console.log({ userOp, userOpHash })
+
+  if (logger != 'eoa') {
+    // Sign the userOp
+  } else {
+    // Sign the userOp
+  }
+
+  // Sign here
+  // const builder = await Presets.Builder.Kernel.init((await provider.getSigner()) as any, rpcUrl, {
+  //   paymasterMiddleware
+  // })
+  // const client = await Client.init(rpcUrl)
+
+  // // Sign here
+  // const res = await client.sendUserOperation(
+  //   calls.length === 1 ? builder.execute(calls[0]) : builder.executeBatch(calls),
+  //   {
+  //     onBuild: op => console.log('Signed UserOperation', op)
+  //   }
+  // )
+  // const ev = await res.wait()
+
+  // console.log(ev)
 }
 
 export const fillUserOp = async (
@@ -169,11 +182,13 @@ export const fillUserOp = async (
   Account: ContractFactory,
   entryPoint: Contract,
   initCode: string,
-  callData: {
-    receiver: string
-    amount: bigint
-    data: string
-  }
+  callDatas: [
+    {
+      receiver: string
+      amount: bigint
+      data: string
+    }
+  ]
 ) => {
   // const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY
 
@@ -184,12 +199,31 @@ export const fillUserOp = async (
   // const epAddress: string = EP_ADDRESS
   const pmAddress: string = PM_ADDRESS
 
+  let receivers: string[] | string
+  let amounts: bigint[] | bigint
+  let datas: string[] | string
+
+  if (callDatas.length > 1) {
+    receivers = []
+    amounts = []
+    datas = []
+    callDatas.map(callData => {
+      ;(receivers as string[]).push(callData.receiver)
+      ;(amounts as bigint[]).push(callData.amount)
+      ;(datas as string[]).push(callData.data)
+    })
+  } else {
+    receivers = callDatas[0].receiver
+    amounts = callDatas[0].amount
+    datas = callDatas[0].data
+  }
+
   // Fill user operation
   const userOp: UserOp = {
     sender, // smart account address
     nonce: '0x' + (await entryPoint.getNonce(sender, 0)).toString(16),
     initCode,
-    callData: Account.interface.encodeFunctionData('execute', [callData.receiver, callData.amount, callData.data]),
+    callData: Account.interface.encodeFunctionData('execute', [receivers, amounts, datas]),
     paymasterAndData: pmAddress,
     signature:
       '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c'

@@ -115,6 +115,7 @@ const TransactionCard = (props: {
   const [feeToken, setFeeToken] = useState<string>(ERC20_TOKEN_ADDRESSES['6test'])
   const { transactionData, updateTransactionData } = props
   const { successNotify, errorNotify } = useNotify()
+  const { accounts } = useSelector((state: any) => state.account)
 
   //** Redux
   const { provider } = useSelector((state: any) => state.wallet)
@@ -140,7 +141,13 @@ const TransactionCard = (props: {
         requests.push({ to: item.to, value: item.amount, tokenAddress: item.token })
       })
       const calls = await createCalls(provider, requests)
-      await executeCalls(provider, calls, ERC20_TOKEN_ADDRESSES['6test'])
+      await executeCalls(
+        '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+        accounts.find((acc: any) => acc.isSelected == true).logger,
+        provider,
+        calls,
+        ERC20_TOKEN_ADDRESSES['6test']
+      )
 
       successNotify('Transaction completed!')
     } catch (err: any) {
