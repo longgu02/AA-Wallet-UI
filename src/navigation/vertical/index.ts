@@ -14,6 +14,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
 
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
+import { CreditCardOutlined } from '@mui/icons-material'
 
 const navigation = (): VerticalNavItemsType => {
   return [
@@ -51,9 +52,14 @@ const navigation = (): VerticalNavItemsType => {
       path: '/wallet/deposit'
     },
     {
-      title: 'Transaction',
+      title: 'Transfer',
       icon: AlertCircleOutline,
-      path: '/wallet/transactions'
+      path: '/wallet/transfer'
+    },
+    {
+      title: 'Transactions History',
+      icon: AlertCircleOutline,
+      path: '/wallet/transfer'
     },
     {
       sectionTitle: 'Security'
@@ -64,16 +70,24 @@ const navigation = (): VerticalNavItemsType => {
       path: '/security/account'
     },
     {
+      title: 'Manage Sessions',
+      path: '/security/sessions',
+      icon: GoogleCirclesExtended
+    },
+    {
       title: 'Address Book',
       path: '/security/address-book',
       icon: GoogleCirclesExtended
+    },
+    {
+      sectionTitle: 'Plugins'
+    },
+    {
+      title: 'Subscription',
+      icon: CreditCardOutlined,
+      path: '/plugins/subscription'
     }
 
-    // {
-    //   title: 'Cards',
-    //   icon: CreditCardOutline,
-    //   path: '/cards'
-    // },
     // {
     //   title: 'Tables',
     //   icon: Table,

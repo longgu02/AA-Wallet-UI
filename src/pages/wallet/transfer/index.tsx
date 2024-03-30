@@ -9,7 +9,7 @@ const Transactions = () => {
   return (
     <Box>
       <Typography variant='h4' sx={{ marginBottom: 3 }}>
-        AA Wallet
+        Transfer
       </Typography>
       <Grid container spacing={3}>
         <Grid item xs={6}>

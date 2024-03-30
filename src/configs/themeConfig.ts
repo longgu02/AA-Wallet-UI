@@ -17,7 +17,7 @@ type ThemeConfig = {
 
 const themeConfig: ThemeConfig = {
   // ** Layout Configs
-  templateName: 'Materio' /* App Name */,
+  templateName: 'Accountify' /* App Name */,
   mode: 'dark' /* light | dark */,
   contentWidth: 'boxed' /* full | boxed */,
 

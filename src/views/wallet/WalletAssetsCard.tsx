@@ -38,74 +38,11 @@ function createData(token: string, balance: string): Data {
 
 const WalletAssetsCard = () => {
   const [page, setPage] = useState<number>(0)
-  const [rowsPerPage, setRowsPerPage] = useState<number>(10)
   const [rpcProvider, setRpcProvider] = useState<JsonRpcProvider | undefined>()
   const { provider } = useSelector((state: any) => state.wallet)
   const [isLoading, setLoading] = useState<boolean>(false)
   const { accounts } = useSelector((state: any) => state.account)
   const [rows, updateRows] = useImmer<Array<Data>>([])
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage)
-  }
-
-  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value)
-    setPage(0)
-  }
-
-  const genTableBody = () => {
-    if (provider || rpcProvider) {
-      if (accounts.length > 0) {
-        if (isLoading) {
-          return (
-            <CircularProgress
-              sx={{ position: 'absolute', top: '50%', left: '45%', transform: 'translate(-50%, -50%)' }}
-            />
-          )
-        } else {
-          return (
-            <TableBody>
-              {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => {
-                return (
-                  <TableRow
-                    hover
-                    role='checkbox'
-                    tabIndex={-1}
-                    key={row.balance}
-                    onClick={() =>
-                      handleClickToken(
-                        row.token != 'ETH'
-                          ? ERC20_TOKEN_ADDRESSES[row.token.toLowerCase() as keyof typeof ERC20_TOKEN_ADDRESSES]
-                          : 'native'
-                      )
-                    }
-                  >
-                    {columns.map((column, index) => {
-                      const value = row[column.id]
-
-                      return (
-                        <TableCell key={column.id + index} align={column.align}>
-                          {column.format && typeof value === 'number' ? column.format(value) : value}
-                        </TableCell>
-                      )
-                    })}
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          )
-        }
-      } else {
-        return <Typography>Please sign to get your account</Typography>
-      }
-    } else {
-      return <Typography>Please sign to get your account</Typography>
-    }
-  }
-
-  const handleClickToken = (token: string) => {
-    console.log(token)
-  }
 
   useEffect(() => {
     if (provider || rpcProvider) {

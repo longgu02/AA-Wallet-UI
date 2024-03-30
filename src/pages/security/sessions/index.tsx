@@ -1,0 +1,23 @@
+import { Box, Grid, Typography } from '@mui/material'
+import SessionsAddCard from 'src/views/sessions/SessionsAddCard'
+import SessionsListCard from 'src/views/sessions/SessionsListCard'
+
+const Account = () => {
+  return (
+    <Box>
+      <Typography variant='h4' sx={{ marginBottom: 3 }}>
+        Manage Sessions
+      </Typography>
+      <Grid container spacing={3}>
+        <Grid item xs={6}>
+          <SessionsAddCard />
+        </Grid>
+        <Grid item xs={6}>
+          <SessionsListCard />
+        </Grid>
+      </Grid>
+    </Box>
+  )
+}
+
+export default Account
