@@ -1,42 +1,41 @@
-import { Box, Button, Card, CardContent, Grid, Paper, Typography } from '@mui/material'
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
-import { formatEther } from 'ethers'
+import { Box, Button, Card, Paper, Typography } from '@mui/material'
 import { useSelector } from 'react-redux'
+import AddIcon from '@mui/icons-material/Add'
 
 const ECDSAManageCard = () => {
-  const { accountAddress, accountBalance } = useSelector((state: any) => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
 
   return (
-    <Card sx={{ marginBottom: 4, height: 265, padding: 4 }}>
-      <Typography variant='h6' sx={{ marginBottom: 5, marginTop: 2 }}>
-        Signers
-      </Typography>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'start' }}>
-        <Paper sx={{ marginRight: 4, backgroundColor: '#24263D', padding: 3 }}>
-          <Typography>phamlong121120022@gmail.com</Typography>
-          <Typography>Email/Password Signer</Typography>
+    <Card sx={{ marginBottom: 4, minHeight: 265, padding: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+        <Typography variant='h6'>Signers</Typography>
+        <Button sx={{ display: 'flex', textTransform: 'none' }}>
+          <AddIcon sx={{ marginTop: 'auto', marginBottom: 'auto', fontSize: 24 }} />
+          <Typography sx={{ marginTop: 'auto', marginBottom: 'auto' }}>Add Signer</Typography>
+        </Button>
+      </Box>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'start', alignItems: 'stretch', height: '100%' }}>
+        <Paper
+          sx={{
+            marginRight: 4,
+            backgroundColor: '#24263D',
+            padding: 3,
+            minWidth: '200px',
+            minHeight: '150px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end'
+          }}
+        >
+          <Box>
+            <Typography>phamlong121120022@gmail.com</Typography>
+            <Typography>Email/Password Signer</Typography>
 
-          <Typography>0x6969</Typography>
-          <Button fullWidth variant='contained' sx={{ marginTop: 2 }}>
-            Renounce
-          </Button>
-        </Paper>
-        <Paper sx={{ marginRight: 4, backgroundColor: '#24263D', padding: 3 }}>
-          <Typography>phamlong121120022@gmail.com</Typography>
-          <Typography>Email/Password Signer</Typography>
-
-          <Typography>0x6969</Typography>
-          <Button fullWidth variant='contained' sx={{ marginTop: 2 }}>
-            Renounce
-          </Button>
-        </Paper>{' '}
-        <Paper sx={{ marginRight: 4, backgroundColor: '#24263D', padding: 3 }}>
-          <Typography>phamlong121120022@gmail.com</Typography>
-          <Typography>Email/Password Signer</Typography>
-
-          <Typography>0x6969</Typography>
-          <Button fullWidth variant='contained' sx={{ marginTop: 2 }}>
-            Renounce
+            <Typography>0x6969</Typography>
+          </Box>
+          <Button variant='contained' sx={{ marginTop: 2 }}>
+            Remove
           </Button>
         </Paper>
       </Box>

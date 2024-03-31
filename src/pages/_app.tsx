@@ -61,12 +61,12 @@ const App = (props: ExtendedAppProps) => {
   return (
     <CacheProvider value={emotionCache}>
       <Head>
-        <title>{`${themeConfig.templateName} - Material Design React Admin Template`}</title>
+        <title>{`${themeConfig.templateName} - Self-custodial wallet`}</title>
         <meta
           name='description'
-          content={`${themeConfig.templateName} – Material Design React Admin Dashboard Template – is the most developer friendly & highly customizable Admin Dashboard Template based on MUI v5.`}
+          content={`${themeConfig.templateName} – Provide Self-custodial wallet for user with simple user interface and beginner friendly using Account Abstraction `}
         />
-        <meta name='keywords' content='Material Design, MUI, Admin Template, React Admin Template' />
+        <meta name='keywords' content='Accountify, Self-custodial, Modular Account, Account abstraction' />
         <meta name='viewport' content='initial-scale=1, width=device-width' />
       </Head>
 
