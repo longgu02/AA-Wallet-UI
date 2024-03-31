@@ -29,12 +29,10 @@ const ECDSAManageCard = () => {
           }}
         >
           <Box>
-            <Typography>phamlong121120022@gmail.com</Typography>
+            <Typography>{accounts.length > 0 && accounts.find((acc: any) => acc.isSelected).logger}</Typography>
             <Typography>Email/Password Signer</Typography>
-
-            <Typography>0x6969</Typography>
           </Box>
-          <Button variant='contained' sx={{ marginTop: 2 }}>
+          <Button variant='contained' sx={{ marginTop: 2, textTransform: 'none' }}>
             Remove
           </Button>
         </Paper>

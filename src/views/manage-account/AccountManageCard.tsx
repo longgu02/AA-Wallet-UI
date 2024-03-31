@@ -12,29 +12,30 @@ const AccountManageCard = () => {
         Account
       </Typography>
       <Grid container spacing={3}>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <Paper sx={{ marginRight: 4, backgroundColor: '#24263D', padding: 3 }}>
             <Typography>Action</Typography>
-            <Typography>Email/Password Signer</Typography>
-
-            <Typography>0x6969</Typography>
-            <Button fullWidth variant='contained' sx={{ marginTop: 5 }}>
+            <Button fullWidth variant='contained' sx={{ marginTop: 5, textTransform: 'none' }}>
               Freeze
+            </Button>
+            <Button fullWidth variant='contained' sx={{ marginTop: 2, textTransform: 'none' }}>
+              Change password
             </Button>
           </Paper>
         </Grid>
         <Grid item xs={4}>
           <Paper sx={{ marginRight: 4, backgroundColor: '#24263D', padding: 3 }}>
             <Typography>Backup</Typography>
-            <Typography>Email/Password Signer</Typography>
-
-            <Typography>0x6969</Typography>
-            <Button fullWidth variant='contained' sx={{ marginTop: 2 }}>
-              Renounce
+            <Typography>Download backup file or upload file to recover</Typography>
+            <Button fullWidth variant='contained' color='warning' sx={{ marginTop: 2, textTransform: 'none' }}>
+              Upload
+            </Button>
+            <Button fullWidth variant='contained' color='info' sx={{ marginTop: 2, textTransform: 'none' }}>
+              Download
             </Button>
           </Paper>
         </Grid>
-        <Grid item xs={4}>
+        {/* <Grid item xs={4}>
           <Paper sx={{ marginRight: 4, backgroundColor: '#24263D', padding: 3 }}>
             <Typography>Multi-signature</Typography>
             <Typography>Current multi-sig signers:</Typography>
@@ -47,7 +48,7 @@ const AccountManageCard = () => {
               Add
             </Button>
           </Paper>
-        </Grid>
+        </Grid> */}
       </Grid>
     </Card>
   )

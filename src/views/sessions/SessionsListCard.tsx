@@ -1,6 +1,4 @@
-import { Box, Button, Card, CardContent, Grid, Paper, Typography } from '@mui/material'
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
-import { formatEther } from 'ethers'
+import { Box, Button, Card, Paper, Typography } from '@mui/material'
 import { useSelector } from 'react-redux'
 
 const SessionsListCard = () => {
