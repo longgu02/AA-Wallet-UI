@@ -59,12 +59,12 @@ const navigation = (): VerticalNavItemsType => {
     {
       title: 'Transactions History',
       icon: AlertCircleOutline,
-      path: '/wallet/transfer'
+      path: '/wallet/transactions'
     },
     {
       title: 'Paymaster',
       icon: AlertCircleOutline,
-      path: '/wallet/transfer'
+      path: '/paymaster'
     },
     {
       sectionTitle: 'Security'
