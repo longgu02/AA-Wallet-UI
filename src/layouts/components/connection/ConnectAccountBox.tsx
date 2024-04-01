@@ -59,7 +59,8 @@ const ConnectAccountBox = () => {
           paddingRight: 5,
           borderRadius: 2,
           '&:hover': {
-            backgroundColor: '#434343'
+            backgroundColor: '#434343',
+            cursor: 'pointer'
           },
           flexWrap: 'wrap',
           display: 'flex'

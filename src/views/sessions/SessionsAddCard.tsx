@@ -34,6 +34,7 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
   const [type, setType] = useState<string>('Native')
   const [tokenAddress, setTokenAddress] = useState<string>('')
   const [limit, setLimit] = useState<string>('')
+  const [recipient, setRecipient] = useState<string>('')
   const { sessions, setSessions } = props
 
   const typeOption = ['Native', 'ERC-20', 'NFT (ERC-721)']
@@ -59,7 +60,7 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
     const SessionManger = new ContractFactory(sessionManagerAbi, sessionManagerByteCode, provider)
     const { merkleTree, data } = genMerkleTree(ERC20SM_ADDRESS, {
       address: address,
-      recipient: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+      recipient: recipient,
       maxAmount: ethers.parseEther(limit)
     })
 
@@ -83,6 +84,7 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
     const sessionData = {
       account: accounts.find((acc: any) => acc.isSelected).address,
       authorized: address,
+      recipient: recipient,
       validAfter: Number(validAfter),
       validUntil: Number(validUntil),
       sessionVerificationModule: sessionVerificationModule,
@@ -108,7 +110,8 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
         Add new session
       </Typography>
       <Stack spacing={2}>
-        <TextField label='Address' fullWidth onChange={e => setAddress(e.target.value)} />
+        <TextField label='Authorized Address' fullWidth onChange={e => setAddress(e.target.value)} />
+        <TextField label='Recipient' fullWidth onChange={e => setRecipient(e.target.value)} />
         <Box sx={{ display: 'flex', marginBottom: 2 }}>
           <TextField
             label='Valid After'

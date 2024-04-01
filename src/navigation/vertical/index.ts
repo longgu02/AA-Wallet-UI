@@ -62,6 +62,11 @@ const navigation = (): VerticalNavItemsType => {
       path: '/wallet/transfer'
     },
     {
+      title: 'Paymaster',
+      icon: AlertCircleOutline,
+      path: '/wallet/transfer'
+    },
+    {
       sectionTitle: 'Security'
     },
     {
