@@ -12,6 +12,17 @@ export interface UserOp {
   signature: string
 }
 
+export interface SessionDetail {
+  _id: string
+  account: string
+  authorized: string
+  validAfter: number
+  validUntil: number
+  sessionVerificationModule: string
+  token: string
+  limit: string
+}
+
 export enum AccountType {
   EOA,
   EMAIL

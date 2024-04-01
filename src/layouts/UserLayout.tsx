@@ -27,7 +27,7 @@ import { store } from 'src/redux/store'
 import { Provider } from 'react-redux'
 
 // ** Moonpay
-import { MoonPayProvider } from '@moonpay/moonpay-react'
+// import { MoonPayProvider } from '@moonpay/moonpay-react'
 
 //** Wagmi */
 // import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -68,29 +68,29 @@ const UserLayout = ({ children }: Props) => {
 
   return (
     <Provider store={store}>
-      <MoonPayProvider apiKey='pk_test_fA7aXgofpyFnviSKqdHcOGmutwEfh' debug>
-        <SnackbarProvider>
-          <VerticalLayout
-            hidden={hidden}
-            settings={settings}
-            saveSettings={saveSettings}
-            verticalNavItems={VerticalNavItems()} // Navigation Items
-            afterVerticalNavMenuContent={UpgradeToProImg}
-            verticalAppBarContent={(
-              props // AppBar Content
-            ) => (
-              <VerticalAppBarContent
-                hidden={hidden}
-                settings={settings}
-                saveSettings={saveSettings}
-                toggleNavVisibility={props.toggleNavVisibility}
-              />
-            )}
-          >
-            {children}
-          </VerticalLayout>
-        </SnackbarProvider>
-      </MoonPayProvider>
+      {/* <MoonPayProvider apiKey='pk_test_fA7aXgofpyFnviSKqdHcOGmutwEfh' debug> */}
+      <SnackbarProvider>
+        <VerticalLayout
+          hidden={hidden}
+          settings={settings}
+          saveSettings={saveSettings}
+          verticalNavItems={VerticalNavItems()} // Navigation Items
+          afterVerticalNavMenuContent={UpgradeToProImg}
+          verticalAppBarContent={(
+            props // AppBar Content
+          ) => (
+            <VerticalAppBarContent
+              hidden={hidden}
+              settings={settings}
+              saveSettings={saveSettings}
+              toggleNavVisibility={props.toggleNavVisibility}
+            />
+          )}
+        >
+          {children}
+        </VerticalLayout>
+      </SnackbarProvider>
+      {/* </MoonPayProvider> */}
     </Provider>
 
     // <WagmiProvider config={config}>

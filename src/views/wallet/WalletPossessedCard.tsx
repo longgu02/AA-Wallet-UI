@@ -1,10 +1,8 @@
-import { Box, Card, CardContent, Grid, Typography } from '@mui/material'
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet'
-import { formatEther } from 'ethers'
+import { Card, Typography } from '@mui/material'
 import { useSelector } from 'react-redux'
 
 const WalletPossessedCard = () => {
-  const { accountAddress, accountBalance } = useSelector((state: any) => state.account)
+  // const { accountAddress, accountBalance } = useSelector((state: any) => state.account)
 
   return (
     <Card sx={{ marginBottom: 4, height: 265, padding: 4 }}>
