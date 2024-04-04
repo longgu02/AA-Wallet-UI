@@ -1,17 +1,7 @@
 import { Box, Divider, Grid, Paper, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
-
-const PaymasterBox = () => {
-  return (
-    <Box sx={{ backgroundColor: '#24263D', padding: 3 }}>
-      <Typography>Name: Paymaster for my groceries Status</Typography>
-      <Typography>Status: Active</Typography>
-      <Divider />
-      <Typography>Network: Sepolia</Typography>
-      <Typography>Type: Pay-as-you-go </Typography>
-    </Box>
-  )
-}
+import { useState } from 'react'
+import PaymasterBox from './PaymasterBox'
 
 const InternalPaymasterCard = () => {
   return (
@@ -31,6 +21,7 @@ const InternalPaymasterCard = () => {
                 height: '100%',
                 minHeight: 158,
                 position: 'relative',
+                borderRadius: 4,
                 '&:hover': { backgroundColor: '#24263D', cursor: 'pointer' }
               }}
             >

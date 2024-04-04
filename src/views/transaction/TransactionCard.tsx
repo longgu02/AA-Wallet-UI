@@ -150,9 +150,9 @@ const TransactionCard = (props: {
       })
       const calls = await createCalls(provider, requests)
       await executeCalls(
-        accounts.find((acc: any) => acc.isSelected).address,
+        accounts.find((acc: any) => acc.isSelected)?.address,
         '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-        accounts.find((acc: any) => acc.isSelected == true).logger,
+        accounts.find((acc: any) => acc.isSelected == true)?.logger,
         provider,
         calls,
         ERC20_TOKEN_ADDRESSES['6test'],

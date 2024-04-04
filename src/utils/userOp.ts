@@ -166,18 +166,18 @@ export const executeCalls = async (
     // Sign the userOp
   } else {
     // Sign the userOp
-    await client
-      .post('/account/sign-message', {
-        email: logger,
-        password: password,
-        message: userOpHash.toString()
-      })
-      .then(response => {
-        console.log({ response })
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    // await client
+    //   .post('/account/sign-message', {
+    //     email: logger,
+    //     password: password,
+    //     message: userOpHash.toString()
+    //   })
+    //   .then(response => {
+    //     console.log({ response })
+    //   })
+    //   .catch(err => {
+    //     console.log(err)
+    //   })
   }
 
   userOp.signature = defaultAbi.encode(
@@ -250,15 +250,17 @@ export const fillUserOp = async (
     receivers = callDatas[0].receiver
     amounts = callDatas[0].amount
     datas = callDatas[0].data
+    console.log('execute ', receivers, amounts, datas)
     callData = Account.interface.encodeFunctionData('execute', [receivers, amounts, datas])
   }
 
   console.log([receivers, amounts, datas])
+  console.log({ callData })
 
   // Fill user operation
   const userOp: UserOp = {
     sender, // smart account address
-    nonce: '0x' + (await entryPoint.getNonce(sender, 0)).toString(16),
+    nonce: await entryPoint.getNonce(sender, 0),
     initCode,
     callData,
     paymasterAndData: pmAddress,
@@ -274,17 +276,17 @@ export const fillUserOp = async (
   // userOp.preVerificationGas = preVerificationGas
   // userOp.verificationGasLimit = verificationGasLimit
   // userOp.callGasLimit = callGasLimit
-  userOp.preVerificationGas = 900_000 * 4
-  userOp.verificationGasLimit = 900_000 * 4
-  userOp.callGasLimit = 900_000 * 4
+  userOp.preVerificationGas = 900_000 * 10
+  userOp.verificationGasLimit = 900_000 * 10
+  userOp.callGasLimit = 900_000 * 10
 
   // const { maxFeePerGas } = await bundler.getFeeData()
   // userOp.maxFeePerGas = '0x' + maxFeePerGas?.toString(16)
-  userOp.maxFeePerGas = ethers.parseUnits('100', 'gwei')
+  userOp.maxFeePerGas = ethers.parseUnits('1000', 'gwei')
 
   // const maxPriorityFeePerGas = await bundler.send('rundler_maxPriorityFeePerGas', [])
   // userOp.maxPriorityFeePerGas = maxPriorityFeePerGas
-  userOp.maxPriorityFeePerGas = ethers.parseUnits('50', 'gwei')
+  userOp.maxPriorityFeePerGas = ethers.parseUnits('500', 'gwei')
 
   return { userOp: userOp, userOpHash: await entryPoint.getUserOpHash(userOp) }
 }
