@@ -146,7 +146,7 @@ export const subscribeService = async (
     callData: Account.interface.encodeFunctionData('execute', [
       SUBPLUGIN_ADDRESS,
       ethers.parseEther('0'),
-      SubscriptionPlugin.interface.encodeFunctionData('subscribe', [serviceAddress, ethers.parseEther(amount)])
+      SubscriptionPlugin.interface.encodeFunctionData('subscribe', [serviceAddress, amount])
     ]),
     paymasterAndData: pmAddress,
     signature:
