@@ -13,12 +13,13 @@ import { accountAbi, accountByteCode } from 'src/constant/abis/accountAbi'
 import { AF_BYTECODE, accountFactoryAbi } from 'src/constant/abis/accountFactory'
 import { entryPointAbi } from 'src/constant/abis/entryPointAbi'
 import { subscriptionPluginAbi, subscriptionPluginBytecode } from 'src/constant/abis/plugins/subscriptionPluginAbi'
+import { getJsonRpcProvider } from 'src/constant/chain'
 
 export const installPlugin = async (sender: string, publicKey: string, pluginAddress: string, pluginAbi: any) => {
   // const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY
   const defaultAbi = ethers.AbiCoder.defaultAbiCoder()
 
-  const provider = new JsonRpcProvider('http://localhost:8545')
+  const provider = getJsonRpcProvider()
   const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
   const wallet = new Wallet(privateKey)
   const signer = wallet.connect(provider)
@@ -120,7 +121,7 @@ export const subscribeService = async (
 ) => {
   const defaultAbi = ethers.AbiCoder.defaultAbiCoder()
 
-  const provider = new JsonRpcProvider('http://localhost:8545')
+  const provider = getJsonRpcProvider()
   const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
   const wallet = new Wallet(privateKey)
   const signer = wallet.connect(provider)

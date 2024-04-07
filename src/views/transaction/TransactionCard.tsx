@@ -119,7 +119,7 @@ const TransactionCard = (props: {
   const [loading, setLoading] = useState<boolean>(false)
   const [feeToken, setFeeToken] = useState<string>(ERC20_TOKEN_ADDRESSES['6test'])
   const { transactionData, updateTransactionData } = props
-  const { successNotify, errorNotify } = useNotify()
+  const { successNotify, errorNotify, infoNotify } = useNotify()
   const { accounts } = useSelector((state: any) => state.account)
   const [open, setOpen] = useState<boolean>(false)
   const [password, setPassword] = useState<string>('')
@@ -142,27 +142,31 @@ const TransactionCard = (props: {
 
   const handleSendTransaction = async () => {
     setLoading(true)
-    try {
-      const requests: Array<{ to: string; value: string; tokenAddress: string }> = []
-      console.log(transactionData)
-      transactionData.map(item => {
-        requests.push({ to: item.to, value: item.amount, tokenAddress: item.token })
-      })
-      const calls = await createCalls(provider, requests)
-      await executeCalls(
-        accounts.find((acc: any) => acc.isSelected)?.address,
-        '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-        accounts.find((acc: any) => acc.isSelected == true)?.logger,
-        provider,
-        calls,
-        ERC20_TOKEN_ADDRESSES['6test'],
-        password
-      )
+    if (accounts.length > 0) {
+      try {
+        const requests: Array<{ to: string; value: string; tokenAddress: string }> = []
+        console.log(transactionData)
+        transactionData.map(item => {
+          requests.push({ to: item.to, value: item.amount, tokenAddress: item.token })
+        })
+        const calls = await createCalls(provider, requests)
+        await executeCalls(
+          accounts.find((acc: any) => acc.isSelected)?.address,
+          accounts.find((acc: any) => acc.isSelected == true)?.publicKey,
+          accounts.find((acc: any) => acc.isSelected == true)?.logger,
+          provider,
+          calls,
+          ERC20_TOKEN_ADDRESSES['6test'],
+          password
+        )
 
-      successNotify('Transaction completed!')
-    } catch (err: any) {
-      errorNotify(err.message)
-      console.error(err)
+        successNotify('Transaction completed!')
+      } catch (err: any) {
+        errorNotify(err.message)
+        console.error(err)
+      }
+    } else {
+      infoNotify('Connect your account first!')
     }
     setLoading(false)
   }

@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { useImmer } from 'use-immer'
 import { JsonRpcProvider, formatEther } from 'ethers'
 import TablePaper from 'src/components/table-paper'
+import { getJsonRpcProvider } from 'src/constant/chain'
 
 interface Data {
   token: string
@@ -24,9 +25,9 @@ const WalletAssetsCard = () => {
 
   useEffect(() => {
     if (provider || rpcProvider) {
-      if (accounts.find((acc: any) => acc.isSelected == true).address) {
+      if (accounts > 0) {
         setLoading(true)
-        fetchAllBalance(provider ? provider : rpcProvider, accounts.find((acc: any) => acc.isSelected == true).address)
+        fetchAllBalance(provider ? provider : rpcProvider, accounts.find((acc: any) => acc.isSelected == true)?.address)
           .then((res: any) => {
             updateRows([])
             Object.keys(res).map((token: any) => {
@@ -42,7 +43,7 @@ const WalletAssetsCard = () => {
       } else {
       }
     } else {
-      setRpcProvider(new JsonRpcProvider('http://localhost:8545'))
+      setRpcProvider(getJsonRpcProvider())
     }
   }, [provider, accounts, updateRows])
 
@@ -52,7 +53,7 @@ const WalletAssetsCard = () => {
         <Typography variant='h6' sx={{ marginBottom: 5, marginTop: 2 }}>
           Assets
         </Typography>
-        <TablePaper />
+
         {/* <TableContainer sx={{ height: 440 }}>
           <Table stickyHeader aria-label='sticky table'>
             <TableHead>
@@ -76,6 +77,7 @@ const WalletAssetsCard = () => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         /> */}
+        {rows && rows.map((row, index) => <TablePaper />)}
       </CardContent>
     </Card>
   )

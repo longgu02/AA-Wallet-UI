@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { accountAbi } from 'src/constant/abis/accountAbi'
 import { subscriptionPluginAbi, subscriptionPluginBytecode } from 'src/constant/abis/plugins/subscriptionPluginAbi'
 import { SUBPLUGIN_ADDRESS } from 'src/constant/address'
+import { getJsonRpcProvider } from 'src/constant/chain'
 import { client } from 'src/services/client'
 import { installPlugin } from 'src/utils/plugin'
 import ServiceCard from 'src/views/subscription/ServiceCard'
@@ -34,28 +35,29 @@ const SubscriptionPage = () => {
   }
 
   useEffect(() => {
-    const provider = new JsonRpcProvider('http://localhost:8545')
+    const provider = getJsonRpcProvider()
+    if (accounts.length > 0) {
+      client
+        .get('/plugin/subscription/services')
+        .then(res => {
+          setServices(res)
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err)
+        })
 
-    client
-      .get('/plugin/subscription/services')
-      .then(res => {
-        setServices(res)
-        console.log(res)
-      })
-      .catch(err => {
-        console.log(err)
-      })
-
-    const account = new Contract(accounts.find(acc => acc.isSelected)?.address, accountAbi, provider)
-    account
-      .checkPluginInstalled(SUBPLUGIN_ADDRESS)
-      .then(res => {
-        console.log(res)
-        setInstalled(res)
-      })
-      .catch(err => {
-        console.log(err)
-      })
+      const account = new Contract(accounts.find(acc => acc.isSelected)?.address, accountAbi, provider)
+      account
+        .checkPluginInstalled(SUBPLUGIN_ADDRESS)
+        .then(res => {
+          console.log(res)
+          setInstalled(res)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
   }, [])
 
   return (
@@ -94,10 +96,14 @@ const SubscriptionPage = () => {
             </Box>
           ) : (
             <Box>
-              <Typography>Please install the plugin to your account!</Typography>
-              <Button variant='contained' sx={{ marginTop: 4 }} onClick={handleInstall}>
-                Install
-              </Button>
+              <Typography>
+                {accounts.length > 0 ? 'Please install the plugin to your account!' : 'Connect your account first!'}
+              </Typography>
+              {accounts.length > 0 && (
+                <Button variant='contained' sx={{ marginTop: 4 }} onClick={handleInstall}>
+                  Install
+                </Button>
+              )}
             </Box>
           )}
           <Typography>

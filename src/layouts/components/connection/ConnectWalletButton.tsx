@@ -131,7 +131,7 @@ export default function ConnectWalletButton() {
         ) : (
           <>
             <AddIcon sx={{ mr: 1 }} />
-            {getCurSelectedAccount() ? 'Add Account' : 'Connect Wallet'}
+            {getCurSelectedAccount() ? 'Change Account' : 'Connect Wallet'}
           </>
         )}
       </Button>
@@ -184,8 +184,7 @@ export default function ConnectWalletButton() {
             <DialogTitle
               id='alert-dialog-title'
               sx={{
-                textAlign: 'center',
-                backgroundColor: '#EBECEC'
+                textAlign: 'center'
               }}
             >
               <Typography variant='h5'>Choose Wallet</Typography>

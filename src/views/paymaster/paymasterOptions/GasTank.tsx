@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { entryPointAbi, entryPointBytecode } from 'src/constant/abis/entryPointAbi'
 import { EP_ADDRESS, PM_ADDRESS } from 'src/constant/address'
 import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
+import { getJsonRpcProvider } from 'src/constant/chain'
 import { executeCalls } from 'src/utils/userOp'
 
 interface PaymasterGasTank {
@@ -20,7 +21,7 @@ const PaymasterGasTank = (props: PaymasterGasTank) => {
   const [provider, setProvider] = useState()
 
   useEffect(() => {
-    const provider = new JsonRpcProvider('http://localhost:8545')
+    const provider = getJsonRpcProvider()
 
     provider
       .getBalance(accounts.find((acc: any) => acc.isSelected).address)
@@ -34,7 +35,7 @@ const PaymasterGasTank = (props: PaymasterGasTank) => {
   })
 
   const handleDeposit = async () => {
-    const provider = new JsonRpcProvider('http://localhost:8545')
+    const provider = getJsonRpcProvider()
     const EntryPoint = new ContractFactory(entryPointAbi, entryPointBytecode, provider)
 
     await executeCalls(

@@ -13,6 +13,7 @@ import { Updater, useImmer } from 'use-immer'
 import { JsonRpcProvider, formatEther } from 'ethers'
 import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
 import { INITIAL_STATE } from './TransactionCard'
+import { getJsonRpcProvider } from 'src/constant/chain'
 
 interface Column {
   id: 'token' | 'balance'
@@ -113,9 +114,9 @@ const TransactionAssetsCard = (props: {
 
   useEffect(() => {
     if (provider || rpcProvider) {
-      if (accounts.find(acc => acc.isSelected == true).address) {
+      if (accounts.length > 0) {
         setLoading(true)
-        fetchAllBalance(provider ? provider : rpcProvider, accounts.find(acc => acc.isSelected == true).address)
+        fetchAllBalance(provider ? provider : rpcProvider, accounts.find(acc => acc.isSelected == true)?.address)
           .then((res: any) => {
             updateRows([])
             Object.keys(res).map((token: any) => {
@@ -131,7 +132,7 @@ const TransactionAssetsCard = (props: {
       } else {
       }
     } else {
-      setRpcProvider(new JsonRpcProvider('http://localhost:8545'))
+      setRpcProvider(getJsonRpcProvider())
     }
   }, [provider, accounts, updateRows, rpcProvider])
 

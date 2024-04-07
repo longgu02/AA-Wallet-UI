@@ -13,6 +13,7 @@ export const fetchAllBalance = async (provider: BrowserProvider, address: string
   // const weenusBalance = await getBalance(provider, ERC20_TOKEN_ADDRESSES.weenus, address)
   // const testBalance = await getBalance(provider, ERC20_TOKEN_ADDRESSES['6test'], address)
   const nativeBalance = await provider.getBalance(address)
+  console.log(address)
 
   // return { ETH: nativeBalance, weenus: weenusBalance, ['6test']: testBalance }
   return { ETH: nativeBalance }

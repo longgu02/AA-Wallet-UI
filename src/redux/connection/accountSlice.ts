@@ -2,10 +2,9 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 export type AccountState = {
-  // accountAddress: string
-  // accountBalance?: string
   accounts: Array<{
     address: string
+    publicKey: string
     isSelected: boolean
     logger: string
   }>
@@ -31,6 +30,7 @@ export const accountSlice = createSlice({
       action: PayloadAction<
         Array<{
           address: string
+          publicKey: string
           isSelected: boolean
           logger: string
         }>
@@ -41,6 +41,7 @@ export const accountSlice = createSlice({
     selectAccount: (state: AccountState, action: PayloadAction<string>) => {
       const acc: Array<{
         address: string
+        publicKey: string
         isSelected: boolean
         logger: string
       }> = state.accounts
@@ -61,10 +62,14 @@ export const accountSlice = createSlice({
 
       state.accounts = acc
     },
-    addAccount: (state: AccountState, action: PayloadAction<{ address: string; logger: string }>) => {
+    addAccount: (
+      state: AccountState,
+      action: PayloadAction<{ address: string; logger: string; publicKey: string }>
+    ) => {
       let curSelected: string
+      const temp = state.accounts
 
-      state.accounts.forEach(account => {
+      temp.forEach(account => {
         // Validate duplicates
         if (account.address == action.payload.address) {
           selectAccount(curSelected)
@@ -77,7 +82,14 @@ export const accountSlice = createSlice({
       })
 
       // Push to accounts and select
-      state.accounts.push({ address: action.payload.address, logger: action.payload.logger, isSelected: true })
+      temp.push({
+        address: action.payload.address,
+        logger: action.payload.logger,
+        isSelected: true,
+        publicKey: action.payload.publicKey
+      })
+      state.accounts = temp
+      console.log(state.accounts)
     },
     removeAccount: (state: AccountState, action: PayloadAction<string>) => {
       state.accounts.filter(account => account.address != action.payload)

@@ -6,7 +6,7 @@ export interface UserOp {
   callGasLimit?: number
   verificationGasLimit?: number
   preVerificationGas?: number
-  maxFeePerGas?: bigint
+  maxFeePerGas?: bigint | null
   maxPriorityFeePerGas?: bigint
   paymasterAndData: string
   signature: string

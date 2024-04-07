@@ -8,7 +8,8 @@ import { useRouter } from 'next/router'
 // ** MUI Components
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
+
+// import Divider from '@mui/material/Divider'
 import Checkbox from '@mui/material/Checkbox'
 import TextField from '@mui/material/TextField'
 import InputLabel from '@mui/material/InputLabel'
@@ -23,10 +24,10 @@ import InputAdornment from '@mui/material/InputAdornment'
 import MuiFormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel'
 
 // ** Icons Imports
-import Google from 'mdi-material-ui/Google'
-import Github from 'mdi-material-ui/Github'
-import Twitter from 'mdi-material-ui/Twitter'
-import Facebook from 'mdi-material-ui/Facebook'
+// import Google from 'mdi-material-ui/Google'
+// import Github from 'mdi-material-ui/Github'
+// import Twitter from 'mdi-material-ui/Twitter'
+// import Facebook from 'mdi-material-ui/Facebook'
 import EyeOutline from 'mdi-material-ui/EyeOutline'
 import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
 
@@ -42,6 +43,7 @@ import { client } from 'src/services/client'
 import { storeJWT } from 'src/utils'
 import { useDispatch } from 'react-redux'
 import { addAccount } from 'src/redux/connection/accountSlice'
+import useNotify from 'src/hooks/useNotify'
 
 interface State {
   password: string
@@ -74,6 +76,8 @@ const LoginPage = () => {
   })
   const [email, setEmail] = useState<string>('')
   const dispatch = useDispatch()
+  const { successNotify, errorNotify } = useNotify()
+
   // ** Hook
   const theme = useTheme()
   const router = useRouter()
@@ -225,11 +229,13 @@ const LoginPage = () => {
                   .post('/auth/log-in', { email: email, password: values.password })
                   .then(res => {
                     console.log(res)
-                    dispatch(addAccount({ address: res.address, logger: email }))
+                    dispatch(addAccount({ address: res.address, logger: email, publicKey: res.publicKey }))
                     storeJWT(res.jwt)
+                    successNotify('Login successful!')
                     router.push('/')
                   })
                   .catch(err => {
+                    errorNotify(err.message)
                     console.log(err)
                   })
               }}
@@ -241,13 +247,13 @@ const LoginPage = () => {
                 New on our platform?
               </Typography>
               <Typography variant='body2'>
-                <Link passHref href='/pages/register'>
+                <Link passHref href='/register'>
                   <LinkStyled>Create an account</LinkStyled>
                 </Link>
               </Typography>
             </Box>
-            <Divider sx={{ my: 5 }}>or</Divider>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* <Divider sx={{ my: 5 }}>or</Divider> */}
+            {/* <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Link href='/' passHref>
                 <IconButton component='a' onClick={(e: MouseEvent<HTMLElement>) => e.preventDefault()}>
                   <Facebook sx={{ color: '#497ce2' }} />
@@ -270,7 +276,7 @@ const LoginPage = () => {
                   <Google sx={{ color: '#db4437' }} />
                 </IconButton>
               </Link>
-            </Box>
+            </Box> */}
           </form>
         </CardContent>
       </Card>

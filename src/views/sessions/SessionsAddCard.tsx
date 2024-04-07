@@ -16,6 +16,7 @@ import { useSelector } from 'react-redux'
 import { sessionManagerAbi, sessionManagerByteCode } from 'src/constant/abis/modules/sessionKeyManagerAbi'
 import { ERC20SM_ADDRESS, NATIVESM_ADDRESS, SM_ADDRESS } from 'src/constant/address'
 import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
+import { getJsonRpcProvider } from 'src/constant/chain'
 import { client } from 'src/services/client'
 import { SessionDetail } from 'src/types/interfaces'
 import { genMerkleTree } from 'src/utils/session'
@@ -56,7 +57,7 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
     }
 
     // Contract
-    const provider = new JsonRpcProvider('http://localhost:8545')
+    const provider = getJsonRpcProvider()
     const SessionManger = new ContractFactory(sessionManagerAbi, sessionManagerByteCode, provider)
     const { merkleTree, data } = genMerkleTree(ERC20SM_ADDRESS, {
       address: address,

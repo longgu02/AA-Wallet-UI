@@ -18,6 +18,7 @@ import { AF_ADDRESS, ECDSASM_ADDRESS, EP_ADDRESS, PM_ADDRESS } from 'src/constan
 import { AF_BYTECODE, accountFactoryAbi } from 'src/constant/abis/accountFactory'
 import { entryPointAbi } from 'src/constant/abis/entryPointAbi'
 import { client } from 'src/services/client'
+import { getJsonRpcProvider } from 'src/constant/chain'
 
 const rpcUrl = 'https://api.stackup.sh/v1/node/6c329f2e1b005e3e456b00c8e627486477b6c60e2c234d4e028ad30b370d5508'
 const paymasterUrl =
@@ -126,7 +127,7 @@ export const executeCalls = async (
   //   type: 'payg',
   //   token: feeToken
   // })
-  const bundler = new JsonRpcProvider('http://localhost:8545')
+  const bundler = getJsonRpcProvider()
   const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
   const defaultAbi = AbiCoder.defaultAbiCoder()
   const wallet = new Wallet(privateKey)
@@ -222,13 +223,9 @@ export const fillUserOp = async (
     }
   ]
 ) => {
-  // const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY
+  const bundler = getJsonRpcProvider()
 
-  // const bundler = new JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`)
-
-  // Get addresses
-
-  // const epAddress: string = EP_ADDRESS
+  const epAddress: string = EP_ADDRESS
   const pmAddress: string = PM_ADDRESS
 
   let receivers: string[] | string
@@ -260,7 +257,7 @@ export const fillUserOp = async (
   // Fill user operation
   const userOp: UserOp = {
     sender, // smart account address
-    nonce: await entryPoint.getNonce(sender, 0),
+    nonce: '0x' + (await entryPoint.getNonce(sender, 0)).toString(16),
     initCode,
     callData,
     paymasterAndData: pmAddress,
@@ -276,16 +273,20 @@ export const fillUserOp = async (
   // userOp.preVerificationGas = preVerificationGas
   // userOp.verificationGasLimit = verificationGasLimit
   // userOp.callGasLimit = callGasLimit
+
   userOp.preVerificationGas = 900_000 * 10
   userOp.verificationGasLimit = 900_000 * 10
   userOp.callGasLimit = 900_000 * 10
 
   // const { maxFeePerGas } = await bundler.getFeeData()
-  // userOp.maxFeePerGas = '0x' + maxFeePerGas?.toString(16)
+
+  // userOp.maxFeePerGas = maxFeePerGas
+
   userOp.maxFeePerGas = ethers.parseUnits('1000', 'gwei')
 
   // const maxPriorityFeePerGas = await bundler.send('rundler_maxPriorityFeePerGas', [])
   // userOp.maxPriorityFeePerGas = maxPriorityFeePerGas
+
   userOp.maxPriorityFeePerGas = ethers.parseUnits('500', 'gwei')
 
   return { userOp: userOp, userOpHash: await entryPoint.getUserOpHash(userOp) }

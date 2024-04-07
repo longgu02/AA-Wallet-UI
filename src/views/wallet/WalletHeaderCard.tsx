@@ -1,24 +1,26 @@
 import { Card, CardContent, Grid } from '@mui/material'
-import { JsonRpcProvider, formatEther } from 'ethers'
+import { formatEther } from 'ethers'
 import { useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import * as Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
+import { getJsonRpcProvider } from 'src/constant/chain'
 
 const WalletHeaderCard = () => {
   const { accounts } = useSelector((state: any) => state.account)
   const [balance, setBalance] = useState<bigint | undefined>(undefined)
 
   useEffect(() => {
-    const provider = new JsonRpcProvider('http://localhost:8545')
-
-    provider
-      .getBalance(accounts.find((acc: any) => acc.isSelected == true).address)
-      .then(balance => {
-        setBalance(balance)
-        console.log(balance)
-      })
-      .catch(err => console.error(err))
+    const provider = getJsonRpcProvider()
+    if (accounts.length > 0) {
+      provider
+        .getBalance(accounts.find((acc: any) => acc.isSelected == true)?.address)
+        .then(balance => {
+          setBalance(balance)
+          console.log(balance)
+        })
+        .catch(err => console.error(err))
+    }
   }, [accounts])
 
   const options = {
