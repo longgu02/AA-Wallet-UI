@@ -1,4 +1,4 @@
-import { JsonRpcProvider } from 'ethers'
+import { AlchemyProvider, JsonRpcProvider } from 'ethers'
 import { ADDRESS } from './address'
 
 export interface NetworksType {
@@ -58,8 +58,11 @@ export const NETWORKS: NetworksType = {
 export const getJsonRpcProvider = (): JsonRpcProvider => {
   const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
 
-  // const provider = new JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`)
-  const provider = new JsonRpcProvider('http://localhost:8545')
+  // `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+  // const provider = new JsonRpcProvider()
+  const provider = new AlchemyProvider(11155111, ALCHEMY_API_KEY)
+
+  // const provider = new JsonRpcProvider('http://localhost:8545')
 
   // console.log('aaaa', ALCHEMY_API_KEY)
 

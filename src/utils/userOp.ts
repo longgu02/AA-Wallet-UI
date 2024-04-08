@@ -161,36 +161,56 @@ export const executeCalls = async (
     initCode = '0x'
   }
 
-  const { userOp, userOpHash } = await fillUserOp(sender, Account, entryPoint, initCode, calls)
+  const { userOp, userOpHash } = await fillUserOp(sender, Account, entryPoint, initCode, calls, logger, password)
 
   if (logger == 'eoa') {
     // Sign the userOp
   } else {
     // Sign the userOp
-    // await client
-    //   .post('/account/sign-message', {
-    //     email: logger,
-    //     password: password,
-    //     message: userOpHash.toString()
-    //   })
-    //   .then(response => {
-    //     console.log({ response })
-    //   })
-    //   .catch(err => {
-    //     console.log(err)
-    //   })
+    await client
+      .post('/account/sign-message', {
+        email: logger,
+        password: password,
+        message: userOpHash.toString()
+      })
+      .then(response => {
+        console.log({ response })
+        userOp.signature = defaultAbi.encode(['bytes', 'address'], [response, ECDSASM_ADDRESS])
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
-
-  userOp.signature = defaultAbi.encode(
-    ['bytes', 'address'],
-    [await signer.signMessage(ethers.getBytes(userOpHash)), ECDSASM_ADDRESS]
-  )
 
   console.log({ userOp, userOpHash })
 
-  const tx = await entryPoint.handleOps([userOp], publicKey)
-  const receipt = await tx.wait()
-  console.log(receipt)
+  // const tx = await entryPoint.handleOps([userOp], publicKey)
+  // const receipt = await tx.wait()
+  // console.log(receipt)
+
+  const opHash = await bundler.send('eth_sendUserOperation', [userOp, EP_ADDRESS])
+
+  // const receipt = await ethers.bundler.waitForTransaction(opHash);
+  // console.log("Transaction has been mined");
+  // console.log(receipt);
+
+  let transactionHash
+  while (!transactionHash || transactionHash == null) {
+    await bundler.send('eth_getUserOperationByHash', [opHash]).then(res => {
+      if (res != null) {
+        transactionHash = res.transactionHash
+      }
+
+      // console.log(res);
+    })
+  }
+  console.log(transactionHash)
+
+  setTimeout(async () => {
+    const { transactionHash } = await bundler.send('eth_getUserOperationByHash', [opHash])
+
+    console.log(transactionHash)
+  }, 50000)
 
   // Sign here
   // const builder = await Presets.Builder.Kernel.init((await provider.getSigner()) as any, rpcUrl, {
@@ -221,9 +241,13 @@ export const fillUserOp = async (
       amount: bigint
       data: string
     }
-  ]
+  ],
+  logger: string,
+  password?: string
 ) => {
   const bundler = getJsonRpcProvider()
+  console.log(bundler)
+  const defaultAbi = ethers.AbiCoder.defaultAbiCoder()
 
   const epAddress: string = EP_ADDRESS
   const pmAddress: string = PM_ADDRESS
@@ -260,34 +284,60 @@ export const fillUserOp = async (
     nonce: '0x' + (await entryPoint.getNonce(sender, 0)).toString(16),
     initCode,
     callData,
+    callGasLimit: '0x0',
+    verificationGasLimit: '0x0',
+    preVerificationGas: '0x0',
+    maxFeePerGas: '0x0',
+    maxPriorityFeePerGas: '0x0',
     paymasterAndData: pmAddress,
     signature:
       '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c'
   }
 
-  // const { preVerificationGas, verificationGasLimit, callGasLimit } = await bundler.send(
-  //   'eth_estimateUserOperationGas',
-  //   [userOp, epAddress]
-  // )
+  const userOpHash = await entryPoint.getUserOpHash(userOp)
 
-  // userOp.preVerificationGas = preVerificationGas
-  // userOp.verificationGasLimit = verificationGasLimit
-  // userOp.callGasLimit = callGasLimit
+  if (logger == 'eoa') {
+  } else {
+    await client
+      .post('/account/sign-message', {
+        email: logger,
+        password: password,
+        message: userOpHash.toString()
+      })
+      .then(response => {
+        console.log({ response })
+        const signatureWithModuleAddress = defaultAbi.encode(['bytes', 'address'], [response, ECDSASM_ADDRESS])
+        userOp.signature = signatureWithModuleAddress
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
 
-  userOp.preVerificationGas = 900_000 * 10
-  userOp.verificationGasLimit = 900_000 * 10
-  userOp.callGasLimit = 900_000 * 10
+  console.log({ userOp })
 
-  // const { maxFeePerGas } = await bundler.getFeeData()
+  const { preVerificationGas, verificationGasLimit, callGasLimit } = await bundler.send(
+    'eth_estimateUserOperationGas',
+    [userOp, epAddress]
+  )
 
-  // userOp.maxFeePerGas = maxFeePerGas
+  userOp.preVerificationGas = preVerificationGas
+  userOp.verificationGasLimit = verificationGasLimit
+  userOp.callGasLimit = callGasLimit
 
-  userOp.maxFeePerGas = ethers.parseUnits('1000', 'gwei')
+  // userOp.preVerificationGas = 900_000 * 10
+  // userOp.verificationGasLimit = 900_000 * 10
+  // userOp.callGasLimit = 900_000 * 10
 
-  // const maxPriorityFeePerGas = await bundler.send('rundler_maxPriorityFeePerGas', [])
-  // userOp.maxPriorityFeePerGas = maxPriorityFeePerGas
+  const { maxFeePerGas } = await bundler.getFeeData()
+  userOp.maxFeePerGas = '0x' + maxFeePerGas?.toString(16)
 
-  userOp.maxPriorityFeePerGas = ethers.parseUnits('500', 'gwei')
+  // userOp.maxFeePerGas = ethers.parseUnits('1000', 'gwei')
+
+  const maxPriorityFeePerGas = await bundler.send('rundler_maxPriorityFeePerGas', [])
+  userOp.maxPriorityFeePerGas = maxPriorityFeePerGas
+
+  // userOp.maxPriorityFeePerGas = ethers.parseUnits('500', 'gwei')
 
   return { userOp: userOp, userOpHash: await entryPoint.getUserOpHash(userOp) }
 }

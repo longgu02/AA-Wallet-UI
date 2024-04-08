@@ -3,11 +3,11 @@ export interface UserOp {
   nonce: string
   initCode: string
   callData: string
-  callGasLimit?: number
-  verificationGasLimit?: number
-  preVerificationGas?: number
-  maxFeePerGas?: bigint | null
-  maxPriorityFeePerGas?: bigint
+  callGasLimit?: number | string
+  verificationGasLimit?: number | string
+  preVerificationGas?: number | string
+  maxFeePerGas?: bigint | null | string
+  maxPriorityFeePerGas?: bigint | string
   paymasterAndData: string
   signature: string
 }
