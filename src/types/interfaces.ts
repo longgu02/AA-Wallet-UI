@@ -19,6 +19,7 @@ export interface SessionDetail {
   validAfter: number
   validUntil: number
   sessionVerificationModule: string
+  receiver: string
   token: string
   limit: string
 }

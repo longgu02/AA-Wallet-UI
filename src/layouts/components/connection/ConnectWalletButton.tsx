@@ -26,11 +26,12 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { updateWallet } from 'src/redux/connection/walletSlice'
 import { getAccountAddress } from 'src/utils/userOp'
-import { updateAccountAddress, updateAccountBalance } from 'src/redux/connection/accountSlice'
+import { addAccount, updateAccountAddress, updateAccountBalance } from 'src/redux/connection/accountSlice'
 import useNotify from 'src/hooks/useNotify'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 import { useRouter } from 'next/router'
 import AddIcon from '@mui/icons-material/Add'
+import { client } from 'src/services/client'
 
 declare global {
   interface Window {
@@ -81,37 +82,41 @@ export default function ConnectWalletButton() {
       setLoading(true)
       const provider = new ethers.BrowserProvider(window.ethereum)
       provider.send('eth_requestAccounts', []).then(async accounts => {
-        const accountBalance = await provider.getBalance(accounts[0])
-        const network = await provider.getNetwork()
-        const signer = await provider.getSigner()
+        // const accountBalance = await provider.getBalance(accounts[0])
+        // const network = await provider.getNetwork()
+        // const signer = await provider.getSigner()
 
-        console.log('provider', await provider.getSigner())
-        getAccountAddress(provider)
+        // console.log('provider', await provider.getSigner())
+        // getAccountAddress(provider)
+        //   .then(res => {
+        //     dispatch(updateAccountAddress(res))
+        //     provider
+        //       .getBalance(res)
+        //       .then((res: BigInt) => {
+        //         dispatch(updateAccountBalance(res.toString()))
+        //       })
+        //       .catch((err: any) => {
+        //         console.log(err)
+        //       })
+        //   })
+        //   .catch(err => {
+        //     console.error(err)
+        //     errorNotify(err)
+        //   })
+        client
+          .get(`/account/address/${accounts[0]}`)
           .then(res => {
-            dispatch(updateAccountAddress(res))
-            provider
-              .getBalance(res)
-              .then((res: BigInt) => {
-                dispatch(updateAccountBalance(res.toString()))
+            dispatch(
+              addAccount({
+                address: res,
+                logger: 'eoa',
+                publicKey: accounts[0]
               })
-              .catch((err: any) => {
-                console.log(err)
-              })
+            )
           })
           .catch(err => {
             console.error(err)
-            errorNotify(err)
           })
-        dispatch(
-          updateWallet({
-            address: accounts[0],
-            chainId: Number(network.chainId),
-            provider: provider,
-            signer: signer,
-            balance: Number(ethers.formatEther(accountBalance)),
-            isAdmin: false
-          })
-        )
 
         // const signer = await provider.getSigner()
       })

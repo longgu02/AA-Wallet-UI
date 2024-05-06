@@ -59,9 +59,7 @@ const SessionsListCard = (props: SessionsListCardProps) => {
             <Typography>Valid after: {session.validAfter}</Typography>
             <Typography>Valid until: {session.validUntil}</Typography>
 
-            <Typography>Beneficiaries:</Typography>
-            <Typography>0x012370127393</Typography>
-            <Typography>0x120937120379</Typography>
+            <Typography>Beneficiaries: {session.receiver}</Typography>
             <Box sx={{ display: 'flex', marginTop: 3 }}>
               {/* <Button variant='contained' color='warning' sx={{ marginRight: 2, flex: 1 }}>
                 Edit

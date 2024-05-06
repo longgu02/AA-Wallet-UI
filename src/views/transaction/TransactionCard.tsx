@@ -141,6 +141,7 @@ const TransactionCard = (props: {
   }
 
   const handleSendTransaction = async () => {
+    handleClose()
     setLoading(true)
     if (accounts.length > 0) {
       try {
@@ -172,7 +173,11 @@ const TransactionCard = (props: {
   }
 
   const handleOpen = () => {
-    setOpen(true)
+    if (accounts.find((acc: any) => acc.isSelected == true)?.logger != 'eoa') {
+      setOpen(true)
+    } else {
+      handleSendTransaction()
+    }
   }
 
   const handleClose = () => {
@@ -194,11 +199,10 @@ const TransactionCard = (props: {
             <Typography variant='h6' sx={{ marginTop: 'auto', marginBottom: 'auto' }}>
               Send transaction
             </Typography>
-            {!loading ? (
-              <IconButton sx={{ display: 'flex' }} onClick={handleOpen}>
-                <DoubleArrowIcon sx={{ fontSize: 30 }} />
-              </IconButton>
-            ) : (
+            <IconButton sx={{ display: 'flex' }} onClick={handleOpen} disabled={loading}>
+              <DoubleArrowIcon sx={{ fontSize: 30 }} />
+            </IconButton>
+            {loading && (
               <CircularProgress
                 sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
               />

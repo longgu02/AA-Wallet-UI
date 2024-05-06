@@ -25,6 +25,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 // ** Redux
 import { store } from 'src/redux/store'
 import { Provider } from 'react-redux'
+import ConnectionCheck from './components/ConnectionCheck'
 
 // ** Moonpay
 // import { MoonPayProvider } from '@moonpay/moonpay-react'
@@ -87,7 +88,7 @@ const UserLayout = ({ children }: Props) => {
             />
           )}
         >
-          {children}
+          <ConnectionCheck>{children}</ConnectionCheck>
         </VerticalLayout>
       </SnackbarProvider>
       {/* </MoonPayProvider> */}

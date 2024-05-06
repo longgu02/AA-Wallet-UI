@@ -19,7 +19,9 @@ export default function ServiceCard(props: { data: any }) {
       accounts.find(acc => acc.isSelected)?.address,
       data.address,
       data.amount,
-      '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+      accounts.find(acc => acc.isSelected)?.logger,
+      '12112002',
+      accounts.find(acc => acc.isSelected)?.publicKey
     )
       .then(res => {
         client

@@ -232,7 +232,7 @@ const LoginPage = () => {
                     dispatch(addAccount({ address: res.address, logger: email, publicKey: res.publicKey }))
                     storeJWT(res.jwt)
                     successNotify('Login successful!')
-                    router.push('/')
+                    router.push('/wallet')
                   })
                   .catch(err => {
                     errorNotify(err.message)

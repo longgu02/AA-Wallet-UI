@@ -30,15 +30,17 @@ const Deposit = () => {
             <Typography variant='h6'>Direct Deposit</Typography>
             <Typography variant='body1'>You can directly deposit tokens into the account</Typography>
             <Box sx={{ margin: '20px auto 20px auto', display: 'flex', justifyContent: 'center' }}>
-              <Canvas
-                text={'https://github.com/bunlong/next-qrcode'}
-                options={{
-                  errorCorrectionLevel: 'M',
-                  margin: 2,
-                  scale: 4,
-                  width: 200
-                }}
-              />
+              {accounts.length > 0 && (
+                <Canvas
+                  text={accounts.length > 0 && accounts.find(acc => acc.isSelected).address}
+                  options={{
+                    errorCorrectionLevel: 'M',
+                    margin: 2,
+                    scale: 4,
+                    width: 200
+                  }}
+                />
+              )}
             </Box>
             <Box
               sx={{

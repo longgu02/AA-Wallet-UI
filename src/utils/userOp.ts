@@ -165,6 +165,11 @@ export const executeCalls = async (
 
   if (logger == 'eoa') {
     // Sign the userOp
+    const eoaProvider = new ethers.BrowserProvider(window.ethereum)
+    userOp.signature = defaultAbi.encode(
+      ['bytes', 'address'],
+      [await (await eoaProvider.getSigner()).signMessage(ethers.getBytes(userOpHash)), ECDSASM_ADDRESS]
+    )
   } else {
     // Sign the userOp
     await client
@@ -206,11 +211,11 @@ export const executeCalls = async (
   }
   console.log(transactionHash)
 
-  setTimeout(async () => {
-    const { transactionHash } = await bundler.send('eth_getUserOperationByHash', [opHash])
+  // setTimeout(async () => {
+  //   const { transactionHash } = await bundler.send('eth_getUserOperationByHash', [opHash])
 
-    console.log(transactionHash)
-  }, 50000)
+  //   console.log(transactionHash)
+  // }, 50000)
 
   // Sign here
   // const builder = await Presets.Builder.Kernel.init((await provider.getSigner()) as any, rpcUrl, {
@@ -290,29 +295,42 @@ export const fillUserOp = async (
     maxFeePerGas: '0x0',
     maxPriorityFeePerGas: '0x0',
     paymasterAndData: pmAddress,
-    signature:
-      '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c'
+    signature: defaultAbi.encode(
+      ['bytes', 'address'],
+      [
+        '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c',
+        ECDSASM_ADDRESS
+      ]
+    )
   }
 
-  const userOpHash = await entryPoint.getUserOpHash(userOp)
+  // const userOpHash = await entryPoint.getUserOpHash(userOp)
 
-  if (logger == 'eoa') {
-  } else {
-    await client
-      .post('/account/sign-message', {
-        email: logger,
-        password: password,
-        message: userOpHash.toString()
-      })
-      .then(response => {
-        console.log({ response })
-        const signatureWithModuleAddress = defaultAbi.encode(['bytes', 'address'], [response, ECDSASM_ADDRESS])
-        userOp.signature = signatureWithModuleAddress
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
+  // if (logger == 'eoa') {
+  //   const eoaProvider = new ethers.BrowserProvider(window.ethereum)
+  //   userOp.signature = defaultAbi.encode(
+  //     ['bytes', 'address'],
+  //     [
+  //       '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c',
+  //       ECDSASM_ADDRESS
+  //     ]
+  //   )
+  // } else {
+  //   await client
+  //     .post('/account/sign-message', {
+  //       email: logger,
+  //       password: password,
+  //       message: userOpHash.toString()
+  //     })
+  //     .then(response => {
+  //       console.log({ response })
+  //       const signatureWithModuleAddress = defaultAbi.encode(['bytes', 'address'], [response, ECDSASM_ADDRESS])
+  //       userOp.signature = signatureWithModuleAddress
+  //     })
+  //     .catch(err => {
+  //       console.log(err)
+  //     })
+  // }
 
   console.log({ userOp })
 

@@ -59,11 +59,13 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
     // Contract
     const provider = getJsonRpcProvider()
     const SessionManger = new ContractFactory(sessionManagerAbi, sessionManagerByteCode, provider)
-    const { merkleTree, data } = genMerkleTree(ERC20SM_ADDRESS, {
+    const { merkleTree, data } = genMerkleTree(sessionVerificationModule, {
       address: address,
       recipient: recipient,
       maxAmount: ethers.parseEther(limit)
     })
+
+    console.log(data)
 
     await executeCalls(
       accounts.find((acc: any) => acc.isSelected).address,

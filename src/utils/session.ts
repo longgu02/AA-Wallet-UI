@@ -20,13 +20,25 @@ export const genMerkleTree = (
     calculateNativeSessionKeyData(sessionData.address, sessionData.recipient, sessionData.maxAmount)
   ])
 
+  console.log('hioho', [
+    ethers.zeroPadValue('0x00', 6),
+    ethers.zeroPadValue('0x00', 6),
+    ethers.zeroPadValue(sessionValidationModuleAddress, 20),
+    calculateNativeSessionKeyData(sessionData.address, sessionData.recipient, sessionData.maxAmount)
+  ])
+
   const merkleTree = new MerkleTree([ethers.keccak256(data), ethers.keccak256(data)], keccak256, {
     sortPairs: false,
     hashLeaves: false
   })
 
   console.log({
-    hehe: merkleTree.getHexProof(ethers.keccak256(data)).toString(),
+    hehe: [
+      ethers.zeroPadValue('0x00', 6),
+      ethers.zeroPadValue('0x00', 6),
+      ethers.zeroPadValue(sessionValidationModuleAddress, 20),
+      calculateNativeSessionKeyData(sessionData.address, sessionData.recipient, sessionData.maxAmount)
+    ],
     merkleTree,
     data
   })
