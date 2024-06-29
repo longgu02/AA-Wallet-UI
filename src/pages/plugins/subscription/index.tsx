@@ -1,4 +1,15 @@
-import { Box, Button, CircularProgress, Grid, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  TextField,
+  Typography
+} from '@mui/material'
 import { Contract, JsonRpcProvider } from 'ethers'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -15,14 +26,16 @@ const SubscriptionPage = () => {
   const { accounts } = useSelector(state => state.account)
   const [isInstalled, setInstalled] = useState<boolean | undefined>()
   const [isInstallLoading, setInstallLoading] = useState<boolean>(false)
+  const [password, setPassword] = useState<string>('')
+  const [openPassword, setOpenPassword] = useState(false)
 
   const handleInstall = async () => {
     setInstallLoading(true)
     await installPlugin(
-      accounts.find(acc => acc.isSelected)?.address,
+      accounts.find(acc => acc.isSelected)?.address[0],
       accounts.find(acc => acc.isSelected)?.publicKey,
       accounts.find(acc => acc.isSelected)?.logger,
-      '12112002',
+      password,
       SUBPLUGIN_ADDRESS,
       subscriptionPluginAbi
     )
@@ -49,7 +62,7 @@ const SubscriptionPage = () => {
           console.log(err)
         })
 
-      const account = new Contract(accounts.find(acc => acc.isSelected)?.address, accountAbi, provider)
+      const account = new Contract(accounts.find(acc => acc.isSelected)?.address[0], accountAbi, provider)
       account
         .checkPluginInstalled(SUBPLUGIN_ADDRESS)
         .then(res => {
@@ -61,6 +74,14 @@ const SubscriptionPage = () => {
         })
     }
   }, [])
+
+  const handlePasswordOpen = () => {
+    if (accounts.find((acc: any) => acc.isSelected == true)?.logger != 'eoa') {
+      setOpenPassword(true)
+    } else {
+      handleInstall()
+    }
+  }
 
   return (
     <Box sx={{ position: 'relative', height: '80vh' }}>
@@ -102,7 +123,7 @@ const SubscriptionPage = () => {
                 {accounts.length > 0 ? 'Please install the plugin to your account!' : 'Connect your account first!'}
               </Typography>
               {accounts.length > 0 && (
-                <Button variant='contained' sx={{ marginTop: 4 }} onClick={handleInstall}>
+                <Button variant='contained' sx={{ marginTop: 4 }} onClick={handlePasswordOpen}>
                   Install
                 </Button>
               )}
@@ -115,6 +136,34 @@ const SubscriptionPage = () => {
           </Typography>
         </Box>
       )}
+      <Dialog open={openPassword} onClose={() => setOpenPassword(false)}>
+        <DialogTitle>Enter your details</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin='dense'
+            label='Password'
+            type='password'
+            fullWidth
+            variant='standard'
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
+          {/* <TextField
+              margin='dense'
+              label='OTP'
+              type='text'
+              fullWidth
+              variant='standard'
+              value={otp}
+              onChange={e => setOtp(e.target.value)}
+            /> */}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenPassword(false)}>Cancel</Button>
+          <Button onClick={handleInstall}>Execute</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

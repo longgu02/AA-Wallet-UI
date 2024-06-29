@@ -3,7 +3,7 @@ import type { PayloadAction } from '@reduxjs/toolkit'
 
 export type AccountState = {
   accounts: Array<{
-    address: string
+    address: Array<string>
     publicKey: string
     isSelected: boolean
     logger: string
@@ -29,7 +29,7 @@ export const accountSlice = createSlice({
       state: AccountState,
       action: PayloadAction<
         Array<{
-          address: string
+          address: Array<string>
           publicKey: string
           isSelected: boolean
           logger: string
@@ -40,7 +40,7 @@ export const accountSlice = createSlice({
     },
     selectAccount: (state: AccountState, action: PayloadAction<string>) => {
       const acc: Array<{
-        address: string
+        address: Array<string>
         publicKey: string
         isSelected: boolean
         logger: string
@@ -53,7 +53,7 @@ export const accountSlice = createSlice({
       })
 
       // Select the account with the given address
-      const accountToSelect = acc.find(account => account.address === action.payload)
+      const accountToSelect = acc.find(account => account.publicKey === action.payload)
       if (accountToSelect) {
         accountToSelect.isSelected = true
       } else {
@@ -64,7 +64,7 @@ export const accountSlice = createSlice({
     },
     addAccount: (
       state: AccountState,
-      action: PayloadAction<{ address: string; logger: string; publicKey: string }>
+      action: PayloadAction<{ address: Array<string>; logger: string; publicKey: string }>
     ) => {
       let curSelected: string
       const temp = state.accounts

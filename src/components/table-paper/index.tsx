@@ -1,8 +1,9 @@
-import { Box, Grid } from '@mui/material'
+import { Box, Grid, Stack } from '@mui/material'
 import TablePaperRow from './row'
 
-const TablePaper = () => {
-  const colTitle = ['Token', 'Price', 'Value', 'Action']
+const TablePaper = (props: { data: any }) => {
+  const colTitle = ['Token', 'Balance', 'Price', 'Value']
+  const data = props.data
 
   return (
     <Box>
@@ -13,7 +14,11 @@ const TablePaper = () => {
           </Grid>
         ))}
       </Grid>
-      <TablePaperRow />
+      <Stack spacing={2}>
+        {data.map((item: any, index: number) => (
+          <TablePaperRow key={index} data={item} />
+        ))}
+      </Stack>
     </Box>
   )
 }

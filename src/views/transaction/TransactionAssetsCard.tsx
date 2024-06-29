@@ -7,7 +7,7 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
-import { fetchAllBalance } from 'src/utils/connection'
+import { fetchAllBalance, fetchAllBalanceTable } from 'src/utils/connection'
 import { useSelector } from 'react-redux'
 import { Updater, useImmer } from 'use-immer'
 import { JsonRpcProvider, formatEther } from 'ethers'
@@ -58,52 +58,48 @@ const TransactionAssetsCard = (props: {
   }
 
   const genTableBody = () => {
-    if (provider || rpcProvider) {
-      if (accounts.length > 0) {
-        if (isLoading) {
-          return (
-            <CircularProgress
-              sx={{ position: 'absolute', top: '50%', left: '45%', transform: 'translate(-50%, -50%)' }}
-            />
-          )
-        } else {
-          return (
-            <TableBody>
-              {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => {
-                return (
-                  <TableRow
-                    hover
-                    role='checkbox'
-                    tabIndex={-1}
-                    key={row.balance}
-                    onClick={() =>
-                      handleClickToken(
-                        row.token != 'ETH'
-                          ? ERC20_TOKEN_ADDRESSES[row.token.toLowerCase() as keyof typeof ERC20_TOKEN_ADDRESSES]
-                          : 'native'
-                      )
-                    }
-                  >
-                    {columns.map((column, index) => {
-                      const value = row[column.id]
-
-                      return (
-                        <TableCell key={column.id + index} align={column.align}>
-                          {column.format && typeof value === 'number' ? column.format(value) : value}
-                        </TableCell>
-                      )
-                    })}
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          )
-        }
+    if (accounts.length > 0) {
+      if (isLoading) {
+        return (
+          <CircularProgress
+            sx={{ position: 'absolute', top: '50%', left: '45%', transform: 'translate(-50%, -50%)' }}
+          />
+        )
       } else {
-        return <Typography>Please sign to get your account</Typography>
+        return (
+          <TableBody>
+            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => {
+              return (
+                <TableRow
+                  hover
+                  role='checkbox'
+                  tabIndex={-1}
+                  key={row.balance}
+                  onClick={() =>
+                    handleClickToken(
+                      row.token != 'ETH'
+                        ? ERC20_TOKEN_ADDRESSES[row.token.toLowerCase() as keyof typeof ERC20_TOKEN_ADDRESSES]
+                        : 'native'
+                    )
+                  }
+                >
+                  {columns.map((column, index) => {
+                    const value = row[column.id]
+
+                    return (
+                      <TableCell key={column.id + index} align={column.align}>
+                        {column.format && typeof value === 'number' ? column.format(value) : value}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        )
       }
     } else {
-      return <Typography>Connecting to your wallet...</Typography>
+      return <Typography>Please sign to get your account</Typography>
     }
   }
 
@@ -113,26 +109,22 @@ const TransactionAssetsCard = (props: {
   }
 
   useEffect(() => {
-    if (provider || rpcProvider) {
-      if (accounts.length > 0) {
-        setLoading(true)
-        fetchAllBalance(provider ? provider : rpcProvider, accounts.find(acc => acc.isSelected == true)?.address)
-          .then((res: any) => {
-            updateRows([])
-            Object.keys(res).map((token: any) => {
-              updateRows(draft => void draft.push(createData(token.toUpperCase(), formatEther(res[token]))))
-            })
-            console.log(res)
-            setLoading(false)
+    if (accounts.length > 0) {
+      setLoading(true)
+      fetchAllBalanceTable(accounts.find(acc => acc.isSelected == true)?.address[0])
+        .then((res: any) => {
+          updateRows([])
+          Object.keys(res).map((token: any) => {
+            updateRows(draft => void draft.push(createData(token.toUpperCase(), formatEther(res[token]))))
           })
-          .catch(err => {
-            console.log(err)
-            setLoading(false)
-          })
-      } else {
-      }
+          console.log(res)
+          setLoading(false)
+        })
+        .catch(err => {
+          console.log(err)
+          setLoading(false)
+        })
     } else {
-      setRpcProvider(getJsonRpcProvider())
     }
   }, [provider, accounts, updateRows, rpcProvider])
 

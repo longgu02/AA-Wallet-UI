@@ -15,6 +15,7 @@ import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalance
 import ReplyIcon from '@mui/icons-material/Reply'
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import CardMembershipIcon from '@mui/icons-material/CardMembership'
+import BoltIcon from '@mui/icons-material/Bolt'
 
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
@@ -96,6 +97,11 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Subscription',
       icon: CardMembershipIcon,
       path: '/plugins/subscription'
+    },
+    {
+      title: 'Fast Transfer',
+      icon: BoltIcon,
+      path: '/plugins/fast-transfer'
     }
 
     // {

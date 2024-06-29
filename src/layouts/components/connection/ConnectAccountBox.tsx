@@ -42,7 +42,10 @@ const ConnectAccountBox = () => {
   }
   const getCurSelectedAccount = () => {
     const selectedAccount = accounts.find((account: any) => account.isSelected == true)
-    if (selectedAccount) return selectedAccount.address
+    if (selectedAccount) {
+      if (selectedAccount.logger != 'eoa') return selectedAccount.logger
+      else return selectedAccount.publicKey
+    }
   }
 
   // const handleDropdownClose = () => {
@@ -68,7 +71,7 @@ const ConnectAccountBox = () => {
         onClick={handleDropdownOpen}
       >
         <Typography sx={{ color: 'white', marginTop: 'auto', marginBottom: 'auto' }}>
-          {getCurSelectedAccount() ? formatAddress(getCurSelectedAccount(), 7) : 'Connect Wallet'}
+          {getCurSelectedAccount() ? getCurSelectedAccount() : 'Connect Wallet'}
         </Typography>
         {/* <Box sx={{ marginTop: 1 }}>
         <KeyboardArrowDownIcon sx={{ marginTop: 3 }} />

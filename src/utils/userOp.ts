@@ -20,10 +20,6 @@ import { entryPointAbi } from 'src/constant/abis/entryPointAbi'
 import { client } from 'src/services/client'
 import { getJsonRpcProvider } from 'src/constant/chain'
 
-const rpcUrl = 'https://api.stackup.sh/v1/node/6c329f2e1b005e3e456b00c8e627486477b6c60e2c234d4e028ad30b370d5508'
-const paymasterUrl =
-  'https://api.stackup.sh/v1/paymaster/6c329f2e1b005e3e456b00c8e627486477b6c60e2c234d4e028ad30b370d5508'
-
 export const getAccountAddress = async (provider: BrowserProvider) => {
   console.log(provider)
   const builder = await Presets.Builder.Kernel.init((await provider.getSigner()) as any, rpcUrl)
@@ -120,7 +116,7 @@ export const executeCalls = async (
       data: string
     }
   ],
-  feeToken: string,
+  // feeToken?: string,
   password?: string
 ) => {
   // const paymasterMiddleware = Presets.Middleware.verifyingPaymaster(paymasterUrl, {
@@ -128,7 +124,7 @@ export const executeCalls = async (
   //   token: feeToken
   // })
   const bundler = getJsonRpcProvider()
-  const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+  const privateKey = String(process.env.NEXT_PUBLIC_ACCOUNTIFY_KEY)
   const defaultAbi = AbiCoder.defaultAbiCoder()
   const wallet = new Wallet(privateKey)
   const signer = wallet.connect(bundler)
@@ -159,9 +155,20 @@ export const executeCalls = async (
   const code = await bundler.getCode(sender)
   if (code !== '0x') {
     initCode = '0x'
+  } else {
+    const rundler = getJsonRpcProvider()
+    const privateKey: string = String(process.env.NEXT_PUBLIC_ACCOUNTIFY_KEY)
+    const wallet = new Wallet(privateKey)
+    const signer = wallet.connect(rundler)
+    const walletFactory = new Contract(AF_ADDRESS, accountFactoryAbi, signer)
+    const tx = await walletFactory.createAccount(publicKey, ECDSASM_ADDRESS, EP_ADDRESS)
+    const rec = await tx.wait()
+    console.log('create', rec)
+    initCode = '0x'
   }
 
   const { userOp, userOpHash } = await fillUserOp(sender, Account, entryPoint, initCode, calls, logger, password)
+  console.log({ userOp, userOpHash })
 
   if (logger == 'eoa') {
     // Sign the userOp
@@ -294,7 +301,10 @@ export const fillUserOp = async (
     preVerificationGas: '0x0',
     maxFeePerGas: '0x0',
     maxPriorityFeePerGas: '0x0',
+
     paymasterAndData: pmAddress,
+
+    // paymasterAndData: '0x',
     signature: defaultAbi.encode(
       ['bytes', 'address'],
       [

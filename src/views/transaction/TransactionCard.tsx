@@ -117,10 +117,10 @@ const TransactionCard = (props: {
 }) => {
   //** Hooks
   const [loading, setLoading] = useState<boolean>(false)
-  const [feeToken, setFeeToken] = useState<string>(ERC20_TOKEN_ADDRESSES['6test'])
   const { transactionData, updateTransactionData } = props
   const { successNotify, errorNotify, infoNotify } = useNotify()
   const { accounts } = useSelector((state: any) => state.account)
+  const [sender, setSender] = useState<string>(accounts.find((acc: any) => acc.isSelected)?.address[0])
   const [open, setOpen] = useState<boolean>(false)
   const [password, setPassword] = useState<string>('')
   const [otp, setOtp] = useState<string>('')
@@ -152,7 +152,7 @@ const TransactionCard = (props: {
         })
         const calls = await createCalls(provider, requests)
         await executeCalls(
-          accounts.find((acc: any) => acc.isSelected)?.address,
+          sender,
           accounts.find((acc: any) => acc.isSelected == true)?.publicKey,
           accounts.find((acc: any) => acc.isSelected == true)?.logger,
           provider,
@@ -209,16 +209,14 @@ const TransactionCard = (props: {
             )}
           </Box>
           {/* <Typography sx={{ marginBottom: 2 }}>Fee Token</Typography> */}
-          <Select
-            placeholder='Fee Token'
-            value={feeToken}
-            fullWidth
-            onChange={event => setFeeToken(event.target.value)}
-          >
-            <MenuItem value={ERC20_TOKEN_ADDRESSES['6test']} defaultChecked>
-              6TEST
-            </MenuItem>
-            <MenuItem value={ERC20_TOKEN_ADDRESSES.usdc}>USDC</MenuItem>
+          <Select placeholder='Account' value={sender} fullWidth onChange={event => setSender(event.target.value)}>
+            {accounts
+              .find((acc: any) => acc.isSelected)
+              ?.address.map((address: string, index: number) => (
+                <MenuItem key={address} value={address} defaultChecked={index == 0}>
+                  {address}
+                </MenuItem>
+              ))}
           </Select>
           {transactionData &&
             transactionData.map((data, index) => (
@@ -253,7 +251,7 @@ const TransactionCard = (props: {
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
-            <TextField
+            {/* <TextField
               margin='dense'
               label='OTP'
               type='text'
@@ -261,7 +259,7 @@ const TransactionCard = (props: {
               variant='standard'
               value={otp}
               onChange={e => setOtp(e.target.value)}
-            />
+            /> */}
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

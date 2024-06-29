@@ -9,12 +9,12 @@ import { getJsonRpcProvider } from 'src/constant/chain'
 const WalletHeaderCard = () => {
   const { accounts } = useSelector((state: any) => state.account)
   const [balance, setBalance] = useState<bigint | undefined>(undefined)
-
+  console.log({ accounts })
   useEffect(() => {
     const provider = getJsonRpcProvider()
     if (accounts.length > 0) {
       provider
-        .getBalance(accounts.find((acc: any) => acc.isSelected == true)?.address)
+        .getBalance(accounts.find((acc: any) => acc.isSelected == true)?.address[0])
         .then(balance => {
           setBalance(balance)
           console.log(balance)
@@ -38,7 +38,7 @@ const WalletHeaderCard = () => {
       verticalAlign: 'middle',
       align: 'center',
       floating: true,
-      text: `$${balance && formatEther(balance)}`,
+      text: `$${balance && Number(formatEther(balance)).toFixed(4)}`,
       style: {
         color: '#ffffff',
         fontSize: '24px'

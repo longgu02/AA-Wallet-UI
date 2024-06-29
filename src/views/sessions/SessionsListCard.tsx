@@ -70,7 +70,7 @@ const SessionsListCard = (props: SessionsListCardProps) => {
                 sx={{ flex: 1 }}
                 onClick={() => handleRenounce(session._id, index)}
               >
-                Renounce
+                Revoke
               </Button>
             </Box>
           </Paper>

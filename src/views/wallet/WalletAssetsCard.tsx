@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography } from '@mui/material'
+import { Card, CardContent, CircularProgress, Typography } from '@mui/material'
 import { useState, useEffect } from 'react'
 import { fetchAllBalance } from 'src/utils/connection'
 import { useSelector } from 'react-redux'
@@ -10,45 +10,43 @@ import { getJsonRpcProvider } from 'src/constant/chain'
 interface Data {
   token: string
   balance: string
+  price: string
 }
 
-function createData(token: string, balance: string): Data {
-  return { token, balance }
+function createData(token: string, balance: string, price: string): Data {
+  return { token, balance, price }
 }
 
 const WalletAssetsCard = () => {
-  const [rpcProvider, setRpcProvider] = useState<JsonRpcProvider | undefined>()
   const { provider } = useSelector((state: any) => state.wallet)
   const [isLoading, setLoading] = useState<boolean>(false)
   const { accounts } = useSelector((state: any) => state.account)
   const [rows, updateRows] = useImmer<Array<Data>>([])
 
   useEffect(() => {
-    if (provider || rpcProvider) {
-      if (accounts > 0) {
-        setLoading(true)
-        fetchAllBalance(provider ? provider : rpcProvider, accounts.find((acc: any) => acc.isSelected == true)?.address)
-          .then((res: any) => {
-            updateRows([])
-            Object.keys(res).map((token: any) => {
-              updateRows(draft => void draft.push(createData(token.toUpperCase(), formatEther(res[token]))))
-            })
-            console.log(res)
-            setLoading(false)
+    setLoading(true)
+    if (accounts.length > 0) {
+      fetchAllBalance(accounts.find((acc: any) => acc.isSelected == true)?.address[0])
+        .then((res: any) => {
+          updateRows([])
+          res.map((token: any) => {
+            updateRows(
+              draft => void draft.push(createData(token.name.toUpperCase(), formatEther(token.balance), token.price))
+            )
           })
-          .catch(err => {
-            console.log(err)
-            setLoading(false)
-          })
-      } else {
-      }
-    } else {
-      setRpcProvider(getJsonRpcProvider())
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
+    setLoading(false)
   }, [provider, accounts, updateRows])
 
+  console.log(rows)
+
   return (
-    <Card sx={{ position: 'relative', opacity: isLoading ? 0.7 : 1, cursor: 'progress' }}>
+    <Card sx={{ position: 'relative', opacity: isLoading ? 0.7 : 1, cursor: isLoading ? 'progress' : 'auto' }}>
       <CardContent>
         <Typography variant='h6' sx={{ marginBottom: 5, marginTop: 2 }}>
           Assets
@@ -77,7 +75,11 @@ const WalletAssetsCard = () => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         /> */}
-        {rows && rows.map((row, index) => <TablePaper />)}
+        {rows?.length > 0 ? (
+          <TablePaper data={rows} />
+        ) : (
+          <CircularProgress sx={{ marginLeft: 'auto', marginRight: 'auto' }} />
+        )}
       </CardContent>
     </Card>
   )

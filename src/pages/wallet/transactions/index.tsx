@@ -49,7 +49,7 @@ const TransactionsPage = () => {
   useEffect(() => {
     if (accounts.length > 0) {
       client
-        .get(`/tx/${accounts.find(acc => acc.isSelected)?.address}`)
+        .get(`/tx/${accounts.find(acc => acc.isSelected)?.address[0]}`)
         .then(res => {
           setRows(res)
           console.log(res)

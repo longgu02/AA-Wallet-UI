@@ -9,8 +9,6 @@ import { executeCalls } from 'src/utils/userOp'
 import AccountManageCard from 'src/views/manage-account/AccountManageCard'
 import ECDSAManageCard from 'src/views/manage-account/ECDSAManageCard'
 
-const ECDSA = 
-
 const Account = () => {
   const [address, setPassword] = useState<string>('')
   const { accounts } = useSelector(state => state.account)
@@ -18,7 +16,7 @@ const Account = () => {
 
   const handleTransfer = async () => {
     await executeCalls(
-      accounts.find((acc: any) => acc.isSelected)?.address,
+      accounts.find((acc: any) => acc.isSelected)?.address[0],
       accounts.find((acc: any) => acc.isSelected == true)?.publicKey,
       accounts.find((acc: any) => acc.isSelected == true)?.logger,
       provider,

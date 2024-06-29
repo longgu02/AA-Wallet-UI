@@ -94,6 +94,28 @@ const LoginPage = () => {
     event.preventDefault()
   }
 
+  const handleKeyDown = (event: any) => {
+    if (event.key == 'Enter') {
+      handleLogin()
+    }
+  }
+
+  const handleLogin = () => {
+    client
+      .post('/auth/log-in', { email: email, password: values.password })
+      .then(res => {
+        console.log(res)
+        dispatch(addAccount({ address: res.address, logger: email, publicKey: res.publicKey }))
+        storeJWT(res.jwt)
+        successNotify('Login successful!')
+        router.push('/wallet')
+      })
+      .catch(err => {
+        errorNotify(err.message)
+        console.log(err)
+      })
+  }
+
   return (
     <Box className='content-center'>
       <Card sx={{ zIndex: 1 }}>
@@ -184,6 +206,7 @@ const LoginPage = () => {
               id='email'
               label='Email'
               value={email}
+              onKeyDown={handleKeyDown}
               onChange={e => {
                 setEmail(e.target.value)
               }}
@@ -195,6 +218,7 @@ const LoginPage = () => {
                 label='Password'
                 value={values.password}
                 id='auth-login-password'
+                onKeyDown={handleKeyDown}
                 onChange={handleChange('password')}
                 type={values.showPassword ? 'text' : 'password'}
                 endAdornment={
@@ -219,27 +243,7 @@ const LoginPage = () => {
                 <LinkStyled onClick={e => e.preventDefault()}>Forgot Password?</LinkStyled>
               </Link>
             </Box>
-            <Button
-              fullWidth
-              size='large'
-              variant='contained'
-              sx={{ marginBottom: 7 }}
-              onClick={() => {
-                client
-                  .post('/auth/log-in', { email: email, password: values.password })
-                  .then(res => {
-                    console.log(res)
-                    dispatch(addAccount({ address: res.address, logger: email, publicKey: res.publicKey }))
-                    storeJWT(res.jwt)
-                    successNotify('Login successful!')
-                    router.push('/wallet')
-                  })
-                  .catch(err => {
-                    errorNotify(err.message)
-                    console.log(err)
-                  })
-              }}
-            >
+            <Button fullWidth size='large' variant='contained' sx={{ marginBottom: 7 }} onClick={handleLogin}>
               Login
             </Button>
             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>

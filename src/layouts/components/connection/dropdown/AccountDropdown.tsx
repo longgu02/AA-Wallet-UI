@@ -19,7 +19,8 @@ import BellOutline from 'mdi-material-ui/BellOutline'
 // ** Third Party Components
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 import ConnectWalletButton from '../ConnectWalletButton'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectAccount } from 'src/redux/connection/accountSlice'
 
 // ** Styled Menu component
 const Menu = styled(MuiMenu)<MenuProps>(({ theme }) => ({
@@ -88,6 +89,7 @@ const NotificationDropdown = () => {
   // ** Hook
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
   const { accounts } = useSelector(state => state.account)
+  const dispatch = useDispatch()
 
   const handleDropdownOpen = (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget)
@@ -107,15 +109,19 @@ const NotificationDropdown = () => {
     }
   }
 
+  console.log({ accounts })
+
   return (
     <>
       {accounts.length > 0 && (
-        <MenuItem disableRipple onClick={handleDropdownClose}>
+        <MenuItem disableRipple onClick={handleDropdownClose} disabled>
           <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-            <Avatar alt='Flora' src='/images/avatars/4.png' />
+            {/* <Avatar alt='Flora' src='/images/avatars/4.png' /> */}
             <Box sx={{ mx: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
               <MenuItemTitle>
-                {accounts.find(acc => acc.isSelected)?.address}
+                {accounts.find(acc => acc.isSelected)?.logger == 'eoa'
+                  ? 'Metamask'
+                  : `Email: ${accounts.find(acc => acc.isSelected)?.logger}`}{' '}
                 <Chip
                   size='small'
                   label='Current'
@@ -124,9 +130,8 @@ const NotificationDropdown = () => {
                 />
               </MenuItemTitle>
               <MenuItemSubtitle variant='body2'>
-                {accounts.find(acc => acc.isSelected)?.logger != 'eoa'
-                  ? accounts.find(acc => acc.isSelected)?.logger
-                  : 'Metamask'}
+                Currently Selected |{' '}
+                {accounts.find(acc => acc.isSelected)?.logger == 'eoa' ? 'Metamask' : `Email/password`}{' '}
               </MenuItemSubtitle>
             </Box>
           </Box>
@@ -138,14 +143,15 @@ const NotificationDropdown = () => {
             !acc.isSelected && (
               <ScrollWrapper>
                 <MenuItem onClick={handleDropdownClose}>
-                  <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-                    <Avatar alt='Flora' src='/images/avatars/4.png' />
+                  <Box
+                    sx={{ width: '100%', display: 'flex', alignItems: 'center' }}
+                    onClick={() => dispatch(selectAccount(acc.publicKey))}
+                  >
+                    {/* <Avatar alt='Flora' src='/images/avatars/4.png' /> */}
                     <Box sx={{ mx: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
-                      <MenuItemTitle>{acc.address}</MenuItemTitle>
+                      <MenuItemTitle>{acc.logger}</MenuItemTitle>
                       <MenuItemSubtitle variant='body2'>
-                        {accounts.find(acc => acc.isSelected)?.logger != 'eoa'
-                          ? accounts.find(acc => acc.isSelected)?.logger
-                          : 'Metamask'}
+                        {acc.logger != 'eoa' ? `Email/password` : 'Metamask'}
                       </MenuItemSubtitle>
                     </Box>
                   </Box>

@@ -4,6 +4,7 @@ import {
   AF_ADDRESS,
   ECDSASM_ADDRESS,
   EP_ADDRESS,
+  FASTPLUGIN_ADDRESS,
   PM_ADDRESS,
   SP_ADDRESS,
   SUBPLUGIN_ADDRESS
@@ -15,6 +16,8 @@ import { entryPointAbi } from 'src/constant/abis/entryPointAbi'
 import { subscriptionPluginAbi, subscriptionPluginBytecode } from 'src/constant/abis/plugins/subscriptionPluginAbi'
 import { getJsonRpcProvider } from 'src/constant/chain'
 import { client } from 'src/services/client'
+import { fillUserOp } from './userOp'
+import { fastTransferBytecode, fastTransferPluginAbi } from 'src/constant/abis/plugins/fastTransferPluginAbi'
 
 export const installPlugin = async (
   sender: string,
@@ -28,7 +31,7 @@ export const installPlugin = async (
   const defaultAbi = ethers.AbiCoder.defaultAbiCoder()
 
   const provider = getJsonRpcProvider()
-  const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+  const privateKey = String(process.env.NEXT_PUBLIC_ACCOUNTIFY_KEY)
   const wallet = new Wallet(privateKey)
   const signer = wallet.connect(provider)
 
@@ -89,28 +92,13 @@ export const installPlugin = async (
     maxFeePerGas: '0x0',
     maxPriorityFeePerGas: '0x0',
     paymasterAndData: pmAddress,
-    signature:
-      '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c'
-  }
-  const preUserOpHash = await entryPoint.getUserOpHash(userOp)
-
-  if (logger == 'eoa') {
-    // Sign the userOp
-  } else {
-    // Sign the userOp
-    await client
-      .post('/account/sign-message', {
-        email: logger,
-        password: password,
-        message: preUserOpHash.toString()
-      })
-      .then(response => {
-        console.log({ response })
-        userOp.signature = defaultAbi.encode(['bytes', 'address'], [response, ECDSASM_ADDRESS])
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    signature: defaultAbi.encode(
+      ['bytes', 'address'],
+      [
+        '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c',
+        ECDSASM_ADDRESS
+      ]
+    )
   }
 
   const { preVerificationGas, verificationGasLimit, callGasLimit } = await provider.send(
@@ -145,6 +133,11 @@ export const installPlugin = async (
 
   if (logger == 'eoa') {
     // Sign the userOp
+    const eoaProvider = new ethers.BrowserProvider(window.ethereum)
+    userOp.signature = defaultAbi.encode(
+      ['bytes', 'address'],
+      [await (await eoaProvider.getSigner()).signMessage(ethers.getBytes(userOpHash)), ECDSASM_ADDRESS]
+    )
   } else {
     // Sign the userOp
     await client
@@ -196,7 +189,7 @@ export const subscribeService = async (
   const defaultAbi = ethers.AbiCoder.defaultAbiCoder()
 
   const provider = getJsonRpcProvider()
-  const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'
+  const privateKey = String(process.env.NEXT_PUBLIC_ACCOUNTIFY_KEY)
   const wallet = new Wallet(privateKey)
   const signer = wallet.connect(provider)
 
@@ -213,73 +206,79 @@ export const subscribeService = async (
   const SubscriptionPlugin = new ContractFactory(subscriptionPluginAbi, subscriptionPluginBytecode)
 
   // Fill user operation
-  const userOp: UserOp = {
-    sender: subscriber, // smart account address
-    nonce: '0x' + (await entryPoint.getNonce(subscriber, 0)).toString(16),
-    initCode: '0x',
-    callData: Account.interface.encodeFunctionData('execute', [
-      SUBPLUGIN_ADDRESS,
-      ethers.parseEther('0'),
-      SubscriptionPlugin.interface.encodeFunctionData('subscribe', [serviceAddress, amount])
-    ]),
-    callGasLimit: '0x0',
-    verificationGasLimit: '0x0',
-    preVerificationGas: '0x0',
-    maxFeePerGas: '0x0',
-    maxPriorityFeePerGas: '0x0',
-    paymasterAndData: pmAddress,
-    signature:
-      '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c'
-  }
+  // const userOp: UserOp = {
+  //   sender: subscriber, // smart account address
+  //   nonce: '0x' + (await entryPoint.getNonce(subscriber, 0)).toString(16),
+  //   initCode: '0x',
+  //   callData: Account.interface.encodeFunctionData('execute', [
+  //     SUBPLUGIN_ADDRESS,
+  //     ethers.parseEther('0'),
+  //     SubscriptionPlugin.interface.encodeFunctionData('subscribe', [serviceAddress, amount])
+  //   ]),
+  //   callGasLimit: '0x0',
+  //   verificationGasLimit: '0x0',
+  //   preVerificationGas: '0x0',
+  //   maxFeePerGas: '0x0',
+  //   maxPriorityFeePerGas: '0x0',
+  //   paymasterAndData: pmAddress,
+  //   signature: defaultAbi.encode(
+  //     ['bytes', 'address'],
+  //     [
+  //       '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c',
+  //       ECDSASM_ADDRESS
+  //     ]
+  //   )
+  // }
 
-  const preUserOpHash = await entryPoint.getUserOpHash(userOp)
+  // const { preVerificationGas, verificationGasLimit, callGasLimit } = await provider.send(
+  //   'eth_estimateUserOperationGas',
+  //   [userOp, EP_ADDRESS]
+  // )
 
-  if (logger == 'eoa') {
-    // Sign the userOp
-  } else {
-    // Sign the userOp
-    await client
-      .post('/account/sign-message', {
-        email: logger,
-        password: password,
-        message: preUserOpHash.toString()
-      })
-      .then(response => {
-        console.log({ response })
-        userOp.signature = defaultAbi.encode(['bytes', 'address'], [response, ECDSASM_ADDRESS])
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
-  console.log({ userOp, userOpHash })
+  // userOp.preVerificationGas = preVerificationGas
+  // userOp.verificationGasLimit = verificationGasLimit
+  // userOp.callGasLimit = callGasLimit
 
-  const { preVerificationGas, verificationGasLimit, callGasLimit } = await provider.send(
-    'eth_estimateUserOperationGas',
-    [userOp, EP_ADDRESS]
-  )
+  // // userOp.preVerificationGas = 900_000 * 4
+  // // userOp.verificationGasLimit = 900_000 * 4
+  // // userOp.callGasLimit = 900_000 * 4
+  // console.log(1)
 
-  userOp.preVerificationGas = preVerificationGas
-  userOp.verificationGasLimit = verificationGasLimit
-  userOp.callGasLimit = callGasLimit
+  // const { maxFeePerGas } = await provider.getFeeData()
+  // userOp.maxFeePerGas = '0x' + maxFeePerGas?.toString(16)
+  // console.log(2)
 
-  // userOp.preVerificationGas = 900_000 * 4
-  // userOp.verificationGasLimit = 900_000 * 4
-  // userOp.callGasLimit = 900_000 * 4
+  // // userOp.maxFeePerGas = ethers.parseUnits('100', 'gwei')
 
-  const { maxFeePerGas } = await provider.getFeeData()
-  userOp.maxFeePerGas = '0x' + maxFeePerGas?.toString(16)
-
-  // userOp.maxFeePerGas = ethers.parseUnits('100', 'gwei')
-
-  const maxPriorityFeePerGas = await provider.send('rundler_maxPriorityFeePerGas', [])
-  userOp.maxPriorityFeePerGas = maxPriorityFeePerGas
+  // const maxPriorityFeePerGas = await provider.send('rundler_maxPriorityFeePerGas', [])
+  // userOp.maxPriorityFeePerGas = maxPriorityFeePerGas
+  // console.log(3)
 
   // userOp.maxPriorityFeePerGas = ethers.parseUnits('50', 'gwei')
-  const userOpHash = await entryPoint.getUserOpHash(userOp)
+  const { userOp, userOpHash } = await fillUserOp(
+    subscriber,
+    Account,
+    entryPoint,
+    '0x',
+    [
+      {
+        receiver: SUBPLUGIN_ADDRESS,
+        amount: ethers.parseEther('0'),
+        data: SubscriptionPlugin.interface.encodeFunctionData('subscribe', [serviceAddress, amount])
+      }
+    ],
+    logger
+  )
+
+  // const userOpHash = await entryPoint.getUserOpHash(userOp)
 
   if (logger == 'eoa') {
     // Sign the userOp
+    const eoaProvider = new ethers.BrowserProvider(window.ethereum)
+    userOp.signature = defaultAbi.encode(
+      ['bytes', 'address'],
+      [await (await eoaProvider.getSigner()).signMessage(ethers.getBytes(userOpHash)), ECDSASM_ADDRESS]
+    )
   } else {
     // Sign the userOp
     await client
@@ -318,4 +317,165 @@ export const subscribeService = async (
   console.log(transactionHash)
 
   return transactionHash
+}
+
+export const createFastSession = async (
+  sender: string,
+  startDate: number,
+  logger: string,
+  password: string,
+  publicKey: string
+) => {
+  const defaultAbi = ethers.AbiCoder.defaultAbiCoder()
+
+  const provider = getJsonRpcProvider()
+  console.log(process.env.NEXT_PUBLIC_ACCOUNTIFY_KEY)
+  const privateKey = String(process.env.NEXT_PUBLIC_ACCOUNTIFY_KEY)
+  const wallet = new Wallet(privateKey)
+  const signer = wallet.connect(provider)
+
+  const entryPoint = new Contract(EP_ADDRESS, entryPointAbi, signer)
+  const Account = new ContractFactory(accountAbi, accountByteCode)
+
+  // const bundler = new JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`)
+
+  // Get addresses
+
+  // const epAddress: string = EP_ADDRESS
+  const pmAddress: string = PM_ADDRESS
+
+  const FastTransferPlugin = new ContractFactory(fastTransferPluginAbi, fastTransferBytecode)
+
+  // Fill user operation
+  // const userOp: UserOp = {
+  //   sender: subscriber, // smart account address
+  //   nonce: '0x' + (await entryPoint.getNonce(subscriber, 0)).toString(16),
+  //   initCode: '0x',
+  //   callData: Account.interface.encodeFunctionData('execute', [
+  //     SUBPLUGIN_ADDRESS,
+  //     ethers.parseEther('0'),
+  //     SubscriptionPlugin.interface.encodeFunctionData('subscribe', [serviceAddress, amount])
+  //   ]),
+  //   callGasLimit: '0x0',
+  //   verificationGasLimit: '0x0',
+  //   preVerificationGas: '0x0',
+  //   maxFeePerGas: '0x0',
+  //   maxPriorityFeePerGas: '0x0',
+  //   paymasterAndData: pmAddress,
+  //   signature: defaultAbi.encode(
+  //     ['bytes', 'address'],
+  //     [
+  //       '0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c',
+  //       ECDSASM_ADDRESS
+  //     ]
+  //   )
+  // }
+
+  // const { preVerificationGas, verificationGasLimit, callGasLimit } = await provider.send(
+  //   'eth_estimateUserOperationGas',
+  //   [userOp, EP_ADDRESS]
+  // )
+
+  // userOp.preVerificationGas = preVerificationGas
+  // userOp.verificationGasLimit = verificationGasLimit
+  // userOp.callGasLimit = callGasLimit
+
+  // // userOp.preVerificationGas = 900_000 * 4
+  // // userOp.verificationGasLimit = 900_000 * 4
+  // // userOp.callGasLimit = 900_000 * 4
+  // console.log(1)
+
+  // const { maxFeePerGas } = await provider.getFeeData()
+  // userOp.maxFeePerGas = '0x' + maxFeePerGas?.toString(16)
+  // console.log(2)
+
+  // // userOp.maxFeePerGas = ethers.parseUnits('100', 'gwei')
+
+  // const maxPriorityFeePerGas = await provider.send('rundler_maxPriorityFeePerGas', [])
+  // userOp.maxPriorityFeePerGas = maxPriorityFeePerGas
+  // console.log(3)
+
+  // userOp.maxPriorityFeePerGas = ethers.parseUnits('50', 'gwei')
+
+  const { userOp, userOpHash } = await fillUserOp(
+    sender,
+    Account,
+    entryPoint,
+    '0x',
+    [
+      {
+        receiver: FASTPLUGIN_ADDRESS,
+        amount: ethers.parseEther('0'),
+        data: FastTransferPlugin.interface.encodeFunctionData('createSession', [startDate, 1, publicKey])
+      }
+    ],
+    logger
+  )
+
+  // const userOpHash = await entryPoint.getUserOpHash(userOp)
+
+  if (logger == 'eoa') {
+    // Sign the userOp
+    const eoaProvider = new ethers.BrowserProvider(window.ethereum)
+    userOp.signature = defaultAbi.encode(
+      ['bytes', 'address'],
+      [await (await eoaProvider.getSigner()).signMessage(ethers.getBytes(userOpHash)), ECDSASM_ADDRESS]
+    )
+  } else {
+    // Sign the userOp
+    await client
+      .post('/account/sign-message', {
+        email: logger,
+        password: password,
+        message: userOpHash.toString()
+      })
+      .then(response => {
+        console.log({ response })
+        userOp.signature = defaultAbi.encode(['bytes', 'address'], [response, ECDSASM_ADDRESS])
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
+  console.log({ userOp, userOpHash })
+
+  const opHash = await provider.send('eth_sendUserOperation', [userOp, EP_ADDRESS])
+
+  // const receipt = await ethers.provider.waitForTransaction(opHash);
+  // console.log("Transaction has been mined");
+  // console.log(receipt);
+
+  let transactionHash
+  while (!transactionHash || transactionHash == null) {
+    await provider.send('eth_getUserOperationByHash', [opHash]).then(res => {
+      if (res != null) {
+        transactionHash = res.transactionHash
+      }
+
+      // console.log(res);
+    })
+  }
+  console.log(transactionHash)
+
+  return transactionHash
+}
+
+export const fastTranfer = async (
+  account: string,
+  startDate: number,
+  nonce: number,
+  receiver: string,
+  amount: string,
+  publicKey: string
+) => {
+  const provider = getJsonRpcProvider()
+  const privateKey = String(process.env.NEXT_PUBLIC_ACCOUNTIFY_KEY)
+  const wallet = new Wallet(privateKey)
+  const signer = wallet.connect(provider)
+  const fastPluginContract = new Contract(FASTPLUGIN_ADDRESS, fastTransferPluginAbi, signer)
+  const tx = await fastPluginContract.transfer(account, receiver, amount, startDate, nonce, publicKey)
+  const receipt = tx.wait()
+
+  return receipt
 }
