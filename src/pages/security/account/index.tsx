@@ -63,7 +63,7 @@ const Account = () => {
 
   const handleSendOtp = async () => {
     await client
-      .get(`/account/register-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}`)
+      .get(`/account/tx-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}`)
       .then(res => {
         setOtpSent(true)
         console.log(res)
@@ -90,10 +90,14 @@ const Account = () => {
       .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}/${otp}`)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .then(res => {
-        handleTransfer()
+        if (res) {
+          handleTransfer()
+        } else {
+          errorNotify('Wrong OTP!')
+        }
       })
       .catch(err => {
-        errorNotify('Wrong OTP!')
+        errorNotify(err.message)
         console.log(err)
       })
   }

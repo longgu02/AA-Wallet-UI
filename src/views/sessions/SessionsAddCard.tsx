@@ -143,7 +143,7 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
 
   const handleSendOtp = async () => {
     await client
-      .get(`/account/register-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}`)
+      .get(`/account/tx-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}`)
       .then(res => {
         setOtpSent(true)
         console.log(res)
@@ -161,10 +161,14 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
     await client
       .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}/${otp}`)
       .then(res => {
-        handleCreate()
+        if (res) {
+          handleCreate()
+        } else {
+          errorNotify('Wrong OTP!')
+        }
       })
       .catch(err => {
-        errorNotify('Wrong OTP!')
+        errorNotify(err.message)
         console.log(err)
       })
   }

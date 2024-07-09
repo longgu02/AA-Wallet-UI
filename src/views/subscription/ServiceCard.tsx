@@ -39,7 +39,7 @@ export default function ServiceCard(props: { data: any }) {
 
   const handleSendOtp = async () => {
     await client
-      .get(`/account/register-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}`)
+      .get(`/account/tx-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}`)
       .then(res => {
         setOtpSent(true)
         console.log(res)
@@ -109,10 +109,14 @@ export default function ServiceCard(props: { data: any }) {
       .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}/${otp}`)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .then(res => {
-        handleSubscribe()
+        if (res) {
+          handleSubscribe()
+        } else {
+          errorNotify('Wrong OTP!')
+        }
       })
       .catch(err => {
-        errorNotify('Wrong OTP!')
+        errorNotify(err.message)
         console.log(err)
       })
   }

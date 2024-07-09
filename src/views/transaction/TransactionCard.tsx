@@ -198,10 +198,14 @@ const TransactionCard = (props: {
       .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}/${otp}`)
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .then(res => {
-        handleSendTransaction()
+        if (res) {
+          handleSendTransaction()
+        } else {
+          errorNotify('Wrong OTP!')
+        }
       })
       .catch(err => {
-        errorNotify('Wrong OTP!')
+        errorNotify(err.message)
         console.log(err)
       })
   }
