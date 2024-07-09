@@ -1,5 +1,4 @@
 import { Box, Button, Paper, Stack, TextField, Typography } from '@mui/material'
-import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { client } from 'src/services/client'
@@ -22,7 +21,7 @@ import { client } from 'src/services/client'
 
 const AddressBook = () => {
   const { accounts } = useSelector((state: any) => state.account)
-  const [contacts, setContacts] = useState()
+  const [contacts, setContacts] = useState([])
 
   useEffect(() => {
     client
@@ -44,7 +43,7 @@ const AddressBook = () => {
       <Box>
         <Stack spacing={3}>
           {contacts &&
-            contacts.map(contact => (
+            contacts.map((contact: any) => (
               <Paper key={contact.address} sx={{ padding: 3, display: 'flex', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Typography sx={{ fontWeight: 500 }}>{contact.name}</Typography>
