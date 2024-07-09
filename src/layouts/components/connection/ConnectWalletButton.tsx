@@ -8,12 +8,10 @@ import {
   DialogTitle,
   IconButton,
   List,
-  ListItem,
   ListItemButton,
   Tooltip,
   Typography
 } from '@mui/material'
-import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import LaunchIcon from '@mui/icons-material/Launch'
 
@@ -25,8 +23,8 @@ import { Eip1193Provider, ethers } from 'ethers'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { updateWallet } from 'src/redux/connection/walletSlice'
-import { getAccountAddress } from 'src/utils/userOp'
-import { addAccount, updateAccountAddress, updateAccountBalance } from 'src/redux/connection/accountSlice'
+import {} from 'src/utils/userOp'
+import { addAccount } from 'src/redux/connection/accountSlice'
 import useNotify from 'src/hooks/useNotify'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 import { useRouter } from 'next/router'

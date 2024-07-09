@@ -10,11 +10,11 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { Contract, JsonRpcProvider } from 'ethers'
+import { Contract } from 'ethers'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { accountAbi } from 'src/constant/abis/accountAbi'
-import { subscriptionPluginAbi, subscriptionPluginBytecode } from 'src/constant/abis/plugins/subscriptionPluginAbi'
+import { subscriptionPluginAbi } from 'src/constant/abis/plugins/subscriptionPluginAbi'
 import { SUBPLUGIN_ADDRESS } from 'src/constant/address'
 import { getJsonRpcProvider } from 'src/constant/chain'
 import { client } from 'src/services/client'

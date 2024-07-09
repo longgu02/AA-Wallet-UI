@@ -3,7 +3,6 @@ import { useQRCode } from 'next-qrcode'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { useSelector } from 'react-redux'
 import { useState } from 'react'
-// import { MoonPayBuyWidget } from '@moonpay/moonpay-react'
 
 const Deposit = () => {
   const { Canvas } = useQRCode()

@@ -17,12 +17,9 @@ import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { ecdsaByteCode, ecdsaRegistryAbi } from 'src/constant/abis/modules/ecdsaRegistryAbi'
 import { ECDSASM_ADDRESS } from 'src/constant/address'
-import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
 import useNotify from 'src/hooks/useNotify'
 import { client } from 'src/services/client'
 import { executeCalls } from 'src/utils/userOp'
-import AccountManageCard from 'src/views/manage-account/AccountManageCard'
-import ECDSAManageCard from 'src/views/manage-account/ECDSAManageCard'
 
 const Account = () => {
   const [address, setAddress] = useState<string>('')

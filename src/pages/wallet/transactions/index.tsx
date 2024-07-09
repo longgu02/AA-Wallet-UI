@@ -13,7 +13,7 @@ import TableContainer from '@mui/material/TableContainer'
 // ** Types Imports
 import { ThemeColor } from 'src/@core/layouts/types'
 import { formatAddress } from 'src/utils'
-import { formatEther, formatUnits } from 'ethers'
+import { formatEther } from 'ethers'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { client } from 'src/services/client'

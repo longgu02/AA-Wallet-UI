@@ -14,16 +14,16 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { Contract, JsonRpcProvider, parseEther } from 'ethers'
+import { Contract, parseEther } from 'ethers'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { accountAbi } from 'src/constant/abis/accountAbi'
-import { subscriptionPluginAbi, subscriptionPluginBytecode } from 'src/constant/abis/plugins/subscriptionPluginAbi'
+import { subscriptionPluginAbi } from 'src/constant/abis/plugins/subscriptionPluginAbi'
 import { FASTPLUGIN_ADDRESS } from 'src/constant/address'
 import { getJsonRpcProvider } from 'src/constant/chain'
 import useNotify from 'src/hooks/useNotify'
 import { client } from 'src/services/client'
-import { createFastSession, fastTranfer, installPlugin } from 'src/utils/plugin'
+import { fastTranfer, installPlugin } from 'src/utils/plugin'
 import CreateSessionButton from 'src/views/fast-transfer/CreateSessionButton'
 import { useImmer } from 'use-immer'
 
