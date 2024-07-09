@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Contract, ContractFactory, JsonRpcProvider, Wallet, ethers } from 'ethers'
 import { UserOp } from 'src/types/interfaces'
 import {

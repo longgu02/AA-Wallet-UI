@@ -23,7 +23,7 @@ import ServiceCard from 'src/views/subscription/ServiceCard'
 
 const SubscriptionPage = () => {
   const [services, setServices] = useState([])
-  const { accounts } = useSelector(state => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
   const [isInstalled, setInstalled] = useState<boolean | undefined>()
   const [isInstallLoading, setInstallLoading] = useState<boolean>(false)
   const [password, setPassword] = useState<string>('')
@@ -33,9 +33,9 @@ const SubscriptionPage = () => {
     setOpenPassword(false)
     setInstallLoading(true)
     await installPlugin(
-      accounts.find(acc => acc.isSelected)?.address[0],
-      accounts.find(acc => acc.isSelected)?.publicKey,
-      accounts.find(acc => acc.isSelected)?.logger,
+      accounts.find((acc: any) => acc.isSelected)?.address[0],
+      accounts.find((acc: any) => acc.isSelected)?.publicKey,
+      accounts.find((acc: any) => acc.isSelected)?.logger,
       password,
       SUBPLUGIN_ADDRESS,
       subscriptionPluginAbi
@@ -63,7 +63,7 @@ const SubscriptionPage = () => {
           console.log(err)
         })
 
-      const account = new Contract(accounts.find(acc => acc.isSelected)?.address[0], accountAbi, provider)
+      const account = new Contract(accounts.find((acc: any) => acc.isSelected)?.address[0], accountAbi, provider)
       account
         .checkPluginInstalled(SUBPLUGIN_ADDRESS)
         .then(res => {

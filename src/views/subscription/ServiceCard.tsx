@@ -6,7 +6,6 @@ import CardMedia from '@mui/material/CardMedia'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import { ContractFactory, formatEther, parseEther } from 'ethers'
-import { subscribeService } from 'src/utils/plugin'
 import { useSelector } from 'react-redux'
 import { client } from 'src/services/client'
 import { executeCalls } from 'src/utils/userOp'
@@ -17,7 +16,7 @@ import useNotify from 'src/hooks/useNotify'
 
 export default function ServiceCard(props: { data: any }) {
   const { data } = props
-  const { accounts } = useSelector(state => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
   const { provider } = useSelector((state: any) => state.wallet)
   const [open, setOpen] = React.useState<boolean>(false)
   const [otp, setOtp] = React.useState<string>('')
@@ -55,7 +54,7 @@ export default function ServiceCard(props: { data: any }) {
     setOpen(false)
     const SubscriptionPlugin = new ContractFactory(subscriptionPluginAbi, subscriptionPluginBytecode)
     await executeCalls(
-      accounts.find(acc => acc.isSelected)?.address[0],
+      accounts.find((acc: any) => acc.isSelected)?.address[0],
       accounts.find((acc: any) => acc.isSelected == true)?.publicKey,
       accounts.find((acc: any) => acc.isSelected == true)?.logger,
       provider,
@@ -70,6 +69,7 @@ export default function ServiceCard(props: { data: any }) {
       // ERC20_TOKEN_ADDRESSES['6test'],
       password
     )
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .then(res => {
         successNotify('Subscribe successfully!')
       })
@@ -79,17 +79,17 @@ export default function ServiceCard(props: { data: any }) {
     setLoading(false)
 
     // await subscribeService(
-    //   accounts.find(acc => acc.isSelected)?.address[0],
+    //   accounts.find((acc: any) => acc.isSelected)?.address[0],
     //   data.address,
     //   data.amount,
-    //   accounts.find(acc => acc.isSelected)?.logger,
+    //   accounts.find((acc: any) => acc.isSelected)?.logger,
     //   '12112002',
-    //   accounts.find(acc => acc.isSelected)?.publicKey
+    //   accounts.find((acc: any) => acc.isSelected)?.publicKey
     // )
     //   .then(res => {
     //     client
     //       .post(`/plugin/subscription/services/${data.address}/subscribe`, {
-    //         address: accounts.find(acc => acc.isSelected)?.address[0]
+    //         address: accounts.find((acc: any) => acc.isSelected)?.address[0]
     //       })
     //       .then(response => {
     //         console.log(res)

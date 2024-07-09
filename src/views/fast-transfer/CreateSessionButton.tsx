@@ -5,22 +5,19 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Paper,
   TextField,
   Typography
 } from '@mui/material'
-import { parseEther } from 'ethers'
-import { Box } from 'mdi-material-ui'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import useNotify from 'src/hooks/useNotify'
 import { client } from 'src/services/client'
-import { createFastSession, fastTranfer } from 'src/utils/plugin'
+import { createFastSession } from 'src/utils/plugin'
 
 const CreateSessionButton = (props: any) => {
   const { startDate, setStartDate } = props
   const [isSessionLoading, setSessionLoading] = useState(false)
-  const { accounts } = useSelector(state => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
   const [otp, setOtp] = useState<string>('')
   const [open, setOpen] = useState<boolean>(false)
   const [isOtpSent, setOtpSent] = useState<boolean>(false)
@@ -43,19 +40,19 @@ const CreateSessionButton = (props: any) => {
     setOpen(false)
     const date = Math.floor(new Date().getTime() / 1000)
     console.log({
-      acc: accounts.find(acc => acc.isSelected)?.address[0],
+      acc: accounts.find((acc: any) => acc.isSelected)?.address[0],
       date,
-      log: accounts.find(acc => acc.isSelected)?.logger,
+      log: accounts.find((acc: any) => acc.isSelected)?.logger,
       password,
-      pub: accounts.find(acc => acc.isSelected)?.publicKey
+      pub: accounts.find((acc: any) => acc.isSelected)?.publicKey
     })
     setSessionLoading(true)
     await createFastSession(
-      accounts.find(acc => acc.isSelected)?.address[0],
+      accounts.find((acc: any) => acc.isSelected)?.address[0],
       date,
-      accounts.find(acc => acc.isSelected)?.logger,
+      accounts.find((acc: any) => acc.isSelected)?.logger,
       password,
-      accounts.find(acc => acc.isSelected)?.publicKey
+      accounts.find((acc: any) => acc.isSelected)?.publicKey
     )
       .then(res => {
         setStartDate(date)
@@ -71,7 +68,7 @@ const CreateSessionButton = (props: any) => {
 
   const handleSendOtp = async () => {
     await client
-      .get(`/account/register-otp/${accounts.find(acc => acc.isSelected)?.logger}`)
+      .get(`/account/register-otp/${accounts.find((acc: any) => acc.isSelected)?.logger}`)
       .then(res => {
         setOtpSent(true)
         console.log(res)
@@ -81,16 +78,16 @@ const CreateSessionButton = (props: any) => {
       })
   }
 
-  const handleCheckOtp = async () => {
-    await client
-      .get(`/account/check-otp/${accounts.find(acc => acc.isSelected)?.logger}/${otp}`)
-      .then(res => {
-        console.log(res)
-      })
-      .catch(err => {
-        console.log(err)
-      })
-  }
+  // const handleCheckOtp = async () => {
+  //   await client
+  //     .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected)?.logger}/${otp}`)
+  //     .then(res => {
+  //       console.log(res)
+  //     })
+  //     .catch(err => {
+  //       console.log(err)
+  //     })
+  // }
 
   return (
     <>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ERC20_ABI } from 'src/constant/abis/erc20Abi'
 import {
   Contract,
@@ -12,7 +13,7 @@ import {
 import { UserOp } from 'src/types/interfaces'
 
 // import { AF_ADDRESS, EP_ADDRESS, PM_ADDRESS } from 'src/constant/address'
-import { Client, ICall, Presets } from 'userop'
+// import { Presets } from 'userop'
 import { accountAbi, accountByteCode } from 'src/constant/abis/accountAbi'
 import { AF_ADDRESS, ECDSASM_ADDRESS, EP_ADDRESS, PM_ADDRESS } from 'src/constant/address'
 import { AF_BYTECODE, accountFactoryAbi } from 'src/constant/abis/accountFactory'
@@ -20,13 +21,13 @@ import { entryPointAbi } from 'src/constant/abis/entryPointAbi'
 import { client } from 'src/services/client'
 import { getJsonRpcProvider } from 'src/constant/chain'
 
-export const getAccountAddress = async (provider: BrowserProvider) => {
-  console.log(provider)
-  const builder = await Presets.Builder.Kernel.init((await provider.getSigner()) as any, rpcUrl)
-  const address = await builder.getSender()
+// export const getAccountAddress = async (provider: BrowserProvider) => {
+//   console.log(provider)
+//   const builder = await Presets.Builder.Kernel.init((await provider.getSigner()) as any, rpcUrl)
+//   const address = await builder.getSender()
 
-  return address
-}
+//   return address
+// }
 
 export const createApproveCall = async (to: string, value: string, erc20TokenAddress: string, erc20: Contract) => {
   return {
@@ -50,13 +51,7 @@ export const createERC20TransferCalls = async (
   value: string,
   erc20TokenAddress: string
 ) => {
-  const userOps: [
-    {
-      receiver: string
-      amount: bigint
-      data: string
-    }
-  ] = []
+  const userOps: any = []
   const erc20: Contract = new Contract(erc20TokenAddress, ERC20_ABI, provider)
 
   const approve = await createApproveCall(to, value, erc20TokenAddress, erc20)
@@ -83,13 +78,7 @@ export const createCalls = async (
   provider: BrowserProvider,
   requests: Array<{ to: string; value: string; tokenAddress?: string }>
 ) => {
-  let userOps: [
-    {
-      receiver: string
-      amount: bigint
-      data: string
-    }
-  ] = []
+  let userOps: any = []
   console.log(requests)
   for (const item of requests) {
     if (item.tokenAddress && item.tokenAddress != 'native') {
@@ -116,6 +105,7 @@ export const executeCalls = async (
       data: string
     }
   ],
+
   // feeToken?: string,
   password?: string
 ) => {

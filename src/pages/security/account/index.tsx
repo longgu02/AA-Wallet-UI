@@ -23,7 +23,7 @@ import { executeCalls } from 'src/utils/userOp'
 
 const Account = () => {
   const [address, setAddress] = useState<string>('')
-  const { accounts } = useSelector(state => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
   const { provider } = useSelector((state: any) => state.wallet)
   const [otp, setOtp] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -51,6 +51,7 @@ const Account = () => {
       ],
       password
     )
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .then(res => {
         successNotify(`Transfer owner successfully to ${address}`)
       })

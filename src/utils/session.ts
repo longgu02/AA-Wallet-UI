@@ -1,11 +1,7 @@
 import { keccak256 } from 'ethereumjs-util'
 import MerkleTree from 'merkletreejs'
-import { Contract, ContractFactory, JsonRpcProvider, Signer, Wallet, ethers } from 'ethers'
-import { fillUserOp } from './userOp'
+import { Signer, ethers } from 'ethers'
 import { UserOp } from 'src/types/interfaces'
-import { accountAbi, accountByteCode } from 'src/constant/abis/accountAbi'
-import { entryPointAbi } from 'src/constant/abis/entryPointAbi'
-import { EP_ADDRESS } from 'src/constant/address'
 
 const defaultAbiCoder = ethers.AbiCoder.defaultAbiCoder()
 

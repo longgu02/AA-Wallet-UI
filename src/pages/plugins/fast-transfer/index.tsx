@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Box,
   Button,
@@ -7,8 +8,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Grid,
-  Modal,
   Paper,
   Stack,
   TextField,
@@ -29,14 +28,14 @@ import { useImmer } from 'use-immer'
 
 const SubscriptionPage = () => {
   const [services, setServices] = useState([])
-  const { accounts } = useSelector(state => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
   const [isInstalled, setInstalled] = useState<boolean | undefined>()
-  const [amounts, setAmounts] = useImmer({})
+  const [amounts, setAmounts] = useImmer<any>({})
   const [isInstallLoading, setInstallLoading] = useState<boolean>(false)
-  const [startDate, setStartDate] = useState()
+  const [startDate, setStartDate] = useState(0)
   const [newName, setNewName] = useState<string>('')
   const [newAddress, setNewAddress] = useState<string>('')
-  const [contacts, setContacts] = useState()
+  const [contacts, setContacts] = useState([{}])
   const [open, setOpen] = useState(false)
   const [password, setPassword] = useState<string>('')
   const [openPassword, setOpenPassword] = useState(false)
@@ -47,7 +46,7 @@ const SubscriptionPage = () => {
 
   useEffect(() => {
     client
-      .get(`/account/${accounts.find(acc => acc.isSelected)?.publicKey}/address-book`)
+      .get(`/account/${accounts.find((acc: any) => acc.isSelected)?.publicKey}/address-book`)
       .then(res => {
         console.log(res)
         setContacts(res)
@@ -60,9 +59,9 @@ const SubscriptionPage = () => {
   const handleInstall = async () => {
     setInstallLoading(true)
     await installPlugin(
-      accounts.find(acc => acc.isSelected)?.address[0],
-      accounts.find(acc => acc.isSelected)?.publicKey,
-      accounts.find(acc => acc.isSelected)?.logger,
+      accounts.find((acc: any) => acc.isSelected)?.address[0],
+      accounts.find((acc: any) => acc.isSelected)?.publicKey,
+      accounts.find((acc: any) => acc.isSelected)?.logger,
       password,
       FASTPLUGIN_ADDRESS,
       subscriptionPluginAbi
@@ -90,7 +89,7 @@ const SubscriptionPage = () => {
           console.log(err)
         })
 
-      const account = new Contract(accounts.find(acc => acc.isSelected)?.address[0], accountAbi, provider)
+      const account = new Contract(accounts.find((acc: any) => acc.isSelected)?.address[0], accountAbi, provider)
       account
         .checkPluginInstalled(FASTPLUGIN_ADDRESS)
         .then(res => {
@@ -107,11 +106,11 @@ const SubscriptionPage = () => {
   //   const date = Math.floor(new Date().getTime() / 1000)
   //   setSessionLoading(true)
   //   await createFastSession(
-  //     accounts.find(acc => acc.isSelected)?.address[0],
+  //     accounts.find((acc: any) => acc.isSelected)?.address[0],
   //     date,
-  //     accounts.find(acc => acc.isSelected)?.logger,
+  //     accounts.find((acc: any) => acc.isSelected)?.logger,
   //     '12112002',
-  //     accounts.find(acc => acc.isSelected)?.publicKey
+  //     accounts.find((acc: any) => acc.isSelected)?.publicKey
   //   )
   //     .then(res => {
   //       setStartDate(date)
@@ -124,16 +123,16 @@ const SubscriptionPage = () => {
   // }
 
   const handleTransfer = async (receiver: string, amount: string) => {
-    setTxLoading(draft => {
+    setTxLoading((draft: any) => {
       draft[receiver] = true
     })
     await fastTranfer(
-      accounts.find(acc => acc.isSelected)?.address[0],
+      accounts.find((acc: any) => acc.isSelected)?.address[0],
       startDate,
       1,
       receiver,
-      parseEther(amount),
-      accounts.find(acc => acc.isSelected)?.publicKey
+      parseEther(amount).toString(),
+      accounts.find((acc: any) => acc.isSelected)?.publicKey
     )
       .then(res => {
         successNotify('Tranfer successfully!')
@@ -143,7 +142,7 @@ const SubscriptionPage = () => {
         errorNotify('Error: ' + err.message)
         console.log(err)
       })
-    setTxLoading(draft => {
+    setTxLoading((draft: any) => {
       draft[receiver] = false
     })
   }
@@ -179,7 +178,7 @@ const SubscriptionPage = () => {
           <Box>
             <Stack spacing={3}>
               {contacts &&
-                contacts.map(contact => (
+                contacts.map((contact: any) => (
                   <Paper key={contact.address} sx={{ padding: 3, display: 'flex', justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                       <Typography sx={{ fontWeight: 500 }}>{contact.name}</Typography>
@@ -190,7 +189,7 @@ const SubscriptionPage = () => {
                         label='Amount'
                         value={amounts[contact.address]}
                         onChange={e => {
-                          setAmounts(draft => {
+                          setAmounts((draft: any) => {
                             draft[contact.address] = e.target.value
                           })
                         }}
@@ -241,7 +240,7 @@ const SubscriptionPage = () => {
                   onClick={() => {
                     client
                       .put('/account/add-address', {
-                        account: accounts.find(acc => acc.isSelected)?.publicKey,
+                        account: accounts.find((acc: any) => acc.isSelected)?.publicKey,
                         address: newAddress,
                         name: newName
                       })

@@ -66,7 +66,7 @@ export const accountSlice = createSlice({
       state: AccountState,
       action: PayloadAction<{ address: Array<string>; logger: string; publicKey: string }>
     ) => {
-      let curSelected: string
+      let curSelected: any
       const temp = state.accounts
 
       temp.forEach(account => {
@@ -92,7 +92,7 @@ export const accountSlice = createSlice({
       console.log(state.accounts)
     },
     removeAccount: (state: AccountState, action: PayloadAction<string>) => {
-      state.accounts.filter(account => account.address != action.payload)
+      state.accounts.filter((account: any) => account.address != action.payload)
     }
 
     // updateAccount: (state, action: PayloadAction<AccountState>) => {

@@ -44,12 +44,12 @@ const statusObj: StatusObj = {
 
 const TransactionsPage = () => {
   const [rows, setRows] = useState<RowType[]>([])
-  const { accounts } = useSelector(state => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
 
   useEffect(() => {
     if (accounts.length > 0) {
       client
-        .get(`/tx/${accounts.find(acc => acc.isSelected)?.address[0]}`)
+        .get(`/tx/${accounts.find((acc: any) => acc.isSelected)?.address[0]}`)
         .then(res => {
           setRows(res)
           console.log(res)

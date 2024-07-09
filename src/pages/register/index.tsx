@@ -97,6 +97,7 @@ const RegisterPage = () => {
   const handleOpen = () => {
     // if (accounts.find((acc: any) => acc.isSelected == true)?.logger != 'eoa') {
     setOpen(true)
+
     // } else {
     // handleSendTransaction()
     // }
@@ -140,19 +141,19 @@ const RegisterPage = () => {
       })
   }
 
-  const handleSignup = async () => {
-    await client
-      .post('/auth/sign-up', { email: email, password: values.password })
-      .then(res => {
-        console.log(res)
-        successNotify('Signup successful!')
-        router.push('/login')
-      })
-      .catch(err => {
-        errorNotify(err.message)
-        console.log(err)
-      })
-  }
+  // const handleSignup = async () => {
+  //   await client
+  //     .post('/auth/sign-up', { email: email, password: values.password })
+  //     .then(res => {
+  //       console.log(res)
+  //       successNotify('Signup successful!')
+  //       router.push('/login')
+  //     })
+  //     .catch(err => {
+  //       errorNotify(err.message)
+  //       console.log(err)
+  //     })
+  // }
 
   return (
     <Box className='content-center'>

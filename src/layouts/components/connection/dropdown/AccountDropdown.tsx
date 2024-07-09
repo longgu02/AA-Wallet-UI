@@ -1,20 +1,15 @@
 // ** React Imports
-import { useState, SyntheticEvent, Fragment, ReactNode } from 'react'
+import { useState, Fragment, ReactNode } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
-import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
 import { styled, Theme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
-import MuiMenu, { MenuProps } from '@mui/material/Menu'
-import MuiAvatar, { AvatarProps } from '@mui/material/Avatar'
 import MuiMenuItem, { MenuItemProps } from '@mui/material/MenuItem'
 import Typography, { TypographyProps } from '@mui/material/Typography'
 
 // ** Icons Imports
-import BellOutline from 'mdi-material-ui/BellOutline'
 
 // ** Third Party Components
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
@@ -23,19 +18,19 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectAccount } from 'src/redux/connection/accountSlice'
 
 // ** Styled Menu component
-const Menu = styled(MuiMenu)<MenuProps>(({ theme }) => ({
-  '& .MuiMenu-paper': {
-    width: 380,
-    overflow: 'hidden',
-    marginTop: theme.spacing(4),
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  },
-  '& .MuiMenu-list': {
-    padding: 0
-  }
-}))
+// const Menu = styled(MuiMenu)<MenuProps>(({ theme }) => ({
+//   '& .MuiMenu-paper': {
+//     width: 380,
+//     overflow: 'hidden',
+//     marginTop: theme.spacing(4),
+//     [theme.breakpoints.down('sm')]: {
+//       width: '100%'
+//     }
+//   },
+//   '& .MuiMenu-list': {
+//     padding: 0
+//   }
+// }))
 
 // ** Styled MenuItem component
 const MenuItem = styled(MuiMenuItem)<MenuItemProps>(({ theme }) => ({
@@ -57,11 +52,11 @@ const PerfectScrollbar = styled(PerfectScrollbarComponent)({
 })
 
 // ** Styled Avatar component
-const Avatar = styled(MuiAvatar)<AvatarProps>({
-  width: '2.375rem',
-  height: '2.375rem',
-  fontSize: '1.125rem'
-})
+// const Avatar = styled(MuiAvatar)<AvatarProps>({
+//   width: '2.375rem',
+//   height: '2.375rem',
+//   fontSize: '1.125rem'
+// })
 
 // ** Styled component for the title in MenuItems
 const MenuItemTitle = styled(Typography)<TypographyProps>(({ theme }) => ({
@@ -84,16 +79,17 @@ const MenuItemSubtitle = styled(Typography)<TypographyProps>({
 
 const NotificationDropdown = () => {
   // ** States
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
 
   // ** Hook
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
-  const { accounts } = useSelector(state => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
   const dispatch = useDispatch()
 
-  const handleDropdownOpen = (event: SyntheticEvent) => {
-    setAnchorEl(event.currentTarget)
-  }
+  // const handleDropdownOpen = (event: SyntheticEvent) => {
+  //   setAnchorEl(event.currentTarget)
+  // }
 
   const handleDropdownClose = () => {
     setAnchorEl(null)
@@ -119,9 +115,9 @@ const NotificationDropdown = () => {
             {/* <Avatar alt='Flora' src='/images/avatars/4.png' /> */}
             <Box sx={{ mx: 4, flex: '1 1', display: 'flex', overflow: 'hidden', flexDirection: 'column' }}>
               <MenuItemTitle>
-                {accounts.find(acc => acc.isSelected)?.logger == 'eoa'
+                {accounts.find((acc: any) => acc.isSelected)?.logger == 'eoa'
                   ? 'Metamask'
-                  : `Email: ${accounts.find(acc => acc.isSelected)?.logger}`}{' '}
+                  : `Email: ${accounts.find((acc: any) => acc.isSelected)?.logger}`}{' '}
                 <Chip
                   size='small'
                   label='Current'
@@ -131,7 +127,7 @@ const NotificationDropdown = () => {
               </MenuItemTitle>
               <MenuItemSubtitle variant='body2'>
                 Currently Selected |{' '}
-                {accounts.find(acc => acc.isSelected)?.logger == 'eoa' ? 'Metamask' : `Email/password`}{' '}
+                {accounts.find((acc: any) => acc.isSelected)?.logger == 'eoa' ? 'Metamask' : `Email/password`}{' '}
               </MenuItemSubtitle>
             </Box>
           </Box>
@@ -139,7 +135,7 @@ const NotificationDropdown = () => {
       )}
       {accounts.length > 0 &&
         accounts.map(
-          acc =>
+          (acc: any) =>
             !acc.isSelected && (
               <ScrollWrapper>
                 <MenuItem onClick={handleDropdownClose}>

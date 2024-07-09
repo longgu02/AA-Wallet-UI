@@ -15,12 +15,11 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { ContractFactory, JsonRpcProvider, ethers } from 'ethers'
+import { ContractFactory, ethers } from 'ethers'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { sessionManagerAbi, sessionManagerByteCode } from 'src/constant/abis/modules/sessionKeyManagerAbi'
 import { ERC20SM_ADDRESS, NATIVESM_ADDRESS, SM_ADDRESS } from 'src/constant/address'
-import { ERC20_TOKEN_ADDRESSES } from 'src/constant/addresses'
 import { getJsonRpcProvider } from 'src/constant/chain'
 import { client } from 'src/services/client'
 import { SessionDetail } from 'src/types/interfaces'
@@ -40,8 +39,6 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
   const { accounts } = useSelector((state: any) => state.account)
   const [address, setAddress] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
-  const [validAfter, setValidAfter] = useState<string>('')
-  const [validUntil, setValidUntil] = useState<string>('')
   const [otp, setOtp] = useState<string>('')
   const [isOtpSent, setOtpSent] = useState<boolean>(false)
   const [type, setType] = useState<string>('Native')
@@ -99,6 +96,7 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
         }
       ],
       password
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     ).catch(e => {
       setLoading(false)
     })
@@ -174,9 +172,9 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
               sx={{ color: 'red', zIndex: 10 }}
               label='From'
               value={fromDate}
-              onChange={newValue => setFromDate(newValue)}
+              onChange={(newValue: any) => setFromDate(newValue)}
             />
-            <DateTimePicker label='To' value={toDate} onChange={newValue => setToDate(newValue)} />
+            <DateTimePicker label='To' value={toDate} onChange={(newValue: any) => setToDate(newValue)} />
             {/* <TextField
             label='Valid After'
             sx={{ flex: 1, marginRight: 2 }}

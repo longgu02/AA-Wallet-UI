@@ -25,12 +25,12 @@ import { useDispatch } from 'react-redux'
 import { updateWallet } from 'src/redux/connection/walletSlice'
 import {} from 'src/utils/userOp'
 import { addAccount } from 'src/redux/connection/accountSlice'
-import useNotify from 'src/hooks/useNotify'
 import MailOutlineIcon from '@mui/icons-material/MailOutline'
 import { useRouter } from 'next/router'
 import AddIcon from '@mui/icons-material/Add'
 import { client } from 'src/services/client'
 
+// import useNotify from 'src/hooks/useNotify'
 declare global {
   interface Window {
     ethereum?: Eip1193Provider | any
@@ -42,7 +42,8 @@ export default function ConnectWalletButton() {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [isOpen, setOpen] = useState<boolean>(false)
   const [isCopied, setCopy] = useState<boolean>(false)
-  const { errorNotify } = useNotify()
+
+  // const { errorNotify } = useNotify()
   const router = useRouter()
 
   // Redux

@@ -103,7 +103,7 @@ const WalletHeaderCard = () => {
         >
           <CardContent>
             <Typography variant='h6' sx={{ marginBottom: 2 }}>
-              {accounts.length != 0 ? accounts.find(acc => acc.isSelected == true).address : 'Connect to your wallet!'}
+              {accounts.length != 0 ? accounts.find((acc: any) => acc.isSelected == true).address : 'Connect to your wallet!'}
             </Typography>
             <Typography sx={{ fontWeight: 500, marginBottom: 3 }}>
               Balance:{' '}

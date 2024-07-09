@@ -8,10 +8,11 @@ const Deposit = () => {
   const { Canvas } = useQRCode()
   const { accounts } = useSelector((state: any) => state.account)
   const [isCopied, setCopied] = useState<boolean>(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isMoonpayVisible, setMoonpayVisible] = useState<boolean>(false)
 
   const handleCopyAddress = () => {
-    const selectedAccount = accounts.find(acc => acc.isSelected)
+    const selectedAccount = accounts.find((acc: any) => acc.isSelected)
     if (selectedAccount) {
       navigator.clipboard.writeText(selectedAccount.address)
       setCopied(true)
@@ -31,7 +32,7 @@ const Deposit = () => {
             <Box sx={{ margin: '20px auto 20px auto', display: 'flex', justifyContent: 'center' }}>
               {accounts.length > 0 && (
                 <Canvas
-                  text={accounts.length > 0 && accounts.find(acc => acc.isSelected).address}
+                  text={accounts.length > 0 && accounts.find((acc: any) => acc.isSelected).address}
                   options={{
                     errorCorrectionLevel: 'M',
                     margin: 2,
@@ -53,7 +54,7 @@ const Deposit = () => {
               }}
             >
               <Typography sx={{ marginTop: 'auto', marginBottom: 'auto' }}>
-                {accounts.length > 0 && accounts.find(acc => acc.isSelected).address}
+                {accounts.length > 0 && accounts.find((acc: any) => acc.isSelected).address}
               </Typography>
               <Tooltip title={isCopied ? 'Copied' : 'Copy Address'}>
                 <IconButton onClick={handleCopyAddress} sx={{ marginLeft: 2 }}>

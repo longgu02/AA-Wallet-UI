@@ -21,12 +21,12 @@ import { client } from 'src/services/client'
 }
 
 const AddressBook = () => {
-  const { accounts } = useSelector(state => state.account)
+  const { accounts } = useSelector((state: any) => state.account)
   const [contacts, setContacts] = useState()
 
   useEffect(() => {
     client
-      .get(`/account/${accounts.find(acc => acc.isSelected)?.publicKey}/address-book`)
+      .get(`/account/${accounts.find((acc: any) => acc.isSelected)?.publicKey}/address-book`)
       .then(res => {
         console.log(res)
         setContacts(res)

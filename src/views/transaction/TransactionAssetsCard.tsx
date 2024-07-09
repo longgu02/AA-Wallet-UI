@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Card, CardContent, CircularProgress, Typography } from '@mui/material'
 import { useState, ChangeEvent, useEffect } from 'react'
 import Table from '@mui/material/Table'
@@ -111,7 +112,7 @@ const TransactionAssetsCard = (props: {
   useEffect(() => {
     if (accounts.length > 0) {
       setLoading(true)
-      fetchAllBalanceTable(accounts.find(acc => acc.isSelected == true)?.address[0])
+      fetchAllBalanceTable(accounts.find((acc: any) => acc.isSelected == true)?.address[0])
         .then((res: any) => {
           updateRows([])
           Object.keys(res).map((token: any) => {

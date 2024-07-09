@@ -197,12 +197,12 @@ const TransactionCard = (props: {
     setOpen(false)
   }
 
-  const handleExecute = () => {
-    // Handle the execution logic here
-    console.log('Password:', password)
-    console.log('OTP:', otp)
-    handleClose()
-  }
+  // const handleExecute = () => {
+  //   // Handle the execution logic here
+  //   console.log('Password:', password)
+  //   console.log('OTP:', otp)
+  //   handleClose()
+  // }
 
   return (
     <>
