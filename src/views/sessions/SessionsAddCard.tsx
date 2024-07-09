@@ -29,6 +29,7 @@ import { executeCalls } from 'src/utils/userOp'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
+import useNotify from 'src/hooks/useNotify'
 
 interface SessionAddCardProp {
   sessions: Array<SessionDetail>
@@ -41,6 +42,8 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [validAfter, setValidAfter] = useState<string>('')
   const [validUntil, setValidUntil] = useState<string>('')
+  const [otp, setOtp] = useState<string>('')
+  const [isOtpSent, setOtpSent] = useState<boolean>(false)
   const [type, setType] = useState<string>('Native')
   const [tokenAddress, setTokenAddress] = useState<string>('')
   const [limit, setLimit] = useState<string>('')
@@ -49,11 +52,13 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
   const [toDate, setToDate] = useState(dayjs(new Date()))
   const [open, setOpen] = useState<boolean>(false)
   const [password, setPassword] = useState<string>('')
+  const { successNotify, errorNotify } = useNotify()
   const { sessions, setSessions } = props
 
   const typeOption = ['Native', 'ERC-20', 'NFT (ERC-721)']
 
   const handleCreate = async () => {
+    setOpen(false)
     setLoading(true)
     let sessionVerificationModule: string
     switch (type) {
@@ -116,13 +121,14 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
       .then((response: SessionDetail) => {
         // State
         setSessions([...sessions, response])
+        successNotify('Session created successfully!')
         setLoading(false)
 
         console.log(response)
       })
       .catch(err => {
         setLoading(false)
-
+        errorNotify('Error creating session')
         console.log(err)
       })
     setLoading(false)
@@ -134,6 +140,18 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
     } else {
       handleCreate()
     }
+  }
+
+  const handleSendOtp = async () => {
+    await client
+      .get(`/account/register-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}`)
+      .then(res => {
+        setOtpSent(true)
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 
   const handleClose = () => {
@@ -185,7 +203,7 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
           <TextField label='Limit' fullWidth onChange={e => setLimit(e.target.value)} />
         </Stack>
         <Box sx={{ marginTop: 4, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant='contained' onClick={handleOpen} disable={accounts.length == 0 || loading}>
+          <Button variant='contained' onClick={handleOpen} disabled={accounts.length == 0 || loading}>
             {loading ? <CircularProgress size={20} color='secondary' /> : 'Add Session'}
           </Button>
         </Box>
@@ -202,6 +220,22 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
+            <TextField
+              margin='dense'
+              label='OTP'
+              type='text'
+              fullWidth
+              variant='standard'
+              value={otp}
+              onChange={e => setOtp(e.target.value)}
+            />
+            <Typography
+              color={isOtpSent ? 'secondary' : 'primary'}
+              sx={{ '&:hover': { cursor: isOtpSent ? 'default' : 'pointer' } }}
+              onClick={handleSendOtp}
+            >
+              {isOtpSent ? 'Otp sent to your email, please check your email!' : 'Send OTP to my email.'}
+            </Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

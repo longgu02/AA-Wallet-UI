@@ -12,10 +12,10 @@ const WalletPage = () => {
       </Typography>
       <Box>
         <Grid container spacing={3}>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={6}>
             <InternalPaymasterCard />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={6}>
             <ExternalPaymasterCard />
           </Grid>
         </Grid>

@@ -25,7 +25,7 @@ const Deposit = () => {
         Deposit
       </Typography>
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <Paper sx={{ padding: 4 }}>
             <Typography variant='h6'>Direct Deposit</Typography>
             <Typography variant='body1'>You can directly deposit tokens into the account</Typography>
@@ -64,7 +64,7 @@ const Deposit = () => {
             </Box>
           </Paper>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <Paper sx={{ padding: 4 }}>
             <Typography variant='h6'>Bank Transfer</Typography>
             <Typography variant='subtitle1'>

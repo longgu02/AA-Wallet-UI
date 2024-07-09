@@ -12,10 +12,10 @@ const Transactions = () => {
         Transfer
       </Typography>
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <TransactionAssetsCard updateTransactionData={updateTransactionData} />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <TransactionCard updateTransactionData={updateTransactionData} transactionData={transactionData} />
         </Grid>
       </Grid>

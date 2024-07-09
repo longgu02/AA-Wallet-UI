@@ -41,6 +41,7 @@ import FooterIllustrationsV1 from 'src/views/pages/auth/FooterIllustration'
 import { useRouter } from 'next/router'
 import { client } from 'src/services/client'
 import useNotify from 'src/hooks/useNotify'
+import { Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
 
 interface State {
   password: string
@@ -74,6 +75,9 @@ const RegisterPage = () => {
     showPassword: false
   })
   const [email, setEmail] = useState<string>('')
+  const [otp, setOtp] = useState<string>('')
+  const [open, setOpen] = useState<boolean>(false)
+  const [isOtpSent, setOtpSent] = useState<boolean>(false)
   const router = useRouter()
   const { successNotify, errorNotify } = useNotify()
 
@@ -88,6 +92,52 @@ const RegisterPage = () => {
   }
   const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
+  }
+
+  const handleOpen = () => {
+    // if (accounts.find((acc: any) => acc.isSelected == true)?.logger != 'eoa') {
+    setOpen(true)
+    // } else {
+    // handleSendTransaction()
+    // }
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const handleSendOtp = async () => {
+    await client
+      .get(`/account/register-otp/${email}`)
+      .then(res => {
+        setOtpSent(true)
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
+  const handleCheckOtp = async () => {
+    await client
+      .get(`/account/check-otp/${email}/${otp}`)
+      .then(res => {
+        client
+          .post('/auth/sign-up', { email: email, password: values.password, otp: otp })
+          .then(res => {
+            console.log(res)
+            successNotify('Signup successful!')
+            router.push('/login')
+          })
+          .catch(err => {
+            errorNotify(err.message)
+            console.log(err)
+          })
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 
   const handleSignup = async () => {
@@ -185,7 +235,7 @@ const RegisterPage = () => {
             <Typography variant='h5' sx={{ fontWeight: 600, marginBottom: 1.5 }}>
               Adventure starts here 🚀
             </Typography>
-            <Typography variant='body2'>Make your app management easy and fun!</Typography>
+            <Typography variant='body2'>Your custodial-wallet creation!</Typography>
           </Box>
           <form noValidate autoComplete='off' onSubmit={e => e.preventDefault()}>
             {/* <TextField autoFocus fullWidth id='username' label='Username' sx={{ marginBottom: 4 }} /> */}
@@ -193,16 +243,17 @@ const RegisterPage = () => {
               fullWidth
               type='email'
               label='Email'
+              autoComplete='none'
               sx={{ marginBottom: 4 }}
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
             <FormControl fullWidth>
-              <InputLabel htmlFor='auth-register-password'>Password</InputLabel>
+              <InputLabel>Password</InputLabel>
               <OutlinedInput
                 label='Password'
+                autoComplete='none'
                 value={values.password}
-                id='auth-register-password'
                 onChange={handleChange('password')}
                 type={values.showPassword ? 'text' : 'password'}
                 endAdornment={
@@ -232,7 +283,7 @@ const RegisterPage = () => {
                 </Fragment>
               }
             />
-            <Button fullWidth size='large' variant='contained' sx={{ marginBottom: 7 }} onClick={handleSignup}>
+            <Button fullWidth size='large' variant='contained' sx={{ marginBottom: 7 }} onClick={handleOpen}>
               Sign up
             </Button>
             <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -273,6 +324,41 @@ const RegisterPage = () => {
           </form>
         </CardContent>
       </Card>
+      <Dialog open={open} onClose={handleClose} maxWidth='xs' fullWidth>
+        <DialogTitle>Enter your OTP</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin='dense'
+            label='OTP'
+            type='string'
+            fullWidth
+            variant='standard'
+            value={otp}
+            onChange={e => setOtp(e.target.value)}
+          />
+          {/* <TextField
+              margin='dense'
+              label='OTP'
+              type='text'
+              fullWidth
+              variant='standard'
+              value={otp}
+              onChange={e => setOtp(e.target.value)}
+            /> */}
+          <Typography
+            color={isOtpSent ? 'secondary' : 'primary'}
+            sx={{ '&:hover': { cursor: isOtpSent ? 'default' : 'pointer' } }}
+            onClick={handleSendOtp}
+          >
+            {isOtpSent ? 'Otp sent to your email, please check your email!' : 'Send OTP to my email.'}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleCheckOtp}>Register</Button>
+        </DialogActions>
+      </Dialog>
       <FooterIllustrationsV1 />
     </Box>
   )

@@ -71,7 +71,7 @@ const ConnectAccountBox = () => {
         onClick={handleDropdownOpen}
       >
         <Typography sx={{ color: 'white', marginTop: 'auto', marginBottom: 'auto' }}>
-          {getCurSelectedAccount() ? getCurSelectedAccount() : 'Connect Wallet'}
+          {getCurSelectedAccount() ? formatAddress(getCurSelectedAccount(), 9) : 'Connect Wallet'}
         </Typography>
         {/* <Box sx={{ marginTop: 1 }}>
         <KeyboardArrowDownIcon sx={{ marginTop: 3 }} />

@@ -15,20 +15,20 @@ const WalletPage = () => {
         AA Wallet
       </Typography>
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <WalletHeaderCard />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <WalletPossessedCard />
         </Grid>
       </Grid>
       <WalletAssetsCard />
       <Box>
         <Grid container spacing={3}>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={6}>
             {/* <WalletAssetsCard updateTransactionData={updateTransactionData} /> */}
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12} md={6}>
             {/* <WalletTransactionCard updateTransactionData={updateTransactionData} transactionData={transactionData} /> */}
           </Grid>
         </Grid>

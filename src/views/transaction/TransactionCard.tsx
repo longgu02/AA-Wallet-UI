@@ -35,6 +35,7 @@ import useNotify from 'src/hooks/useNotify'
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import ClearIcon from '@mui/icons-material/Clear'
+import { client } from 'src/services/client'
 
 const ETHIconUrl = 'https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/512/Ethereum-ETH-icon.png'
 const emptyTokenIconUrl = 'https://sepolia.etherscan.io/images/main/empty-token.png'
@@ -124,6 +125,7 @@ const TransactionCard = (props: {
   const [open, setOpen] = useState<boolean>(false)
   const [password, setPassword] = useState<string>('')
   const [otp, setOtp] = useState<string>('')
+  const [isOtpSent, setOtpSent] = useState<boolean>(false)
 
   //** Redux
   const { provider } = useSelector((state: any) => state.wallet)
@@ -157,7 +159,6 @@ const TransactionCard = (props: {
           accounts.find((acc: any) => acc.isSelected == true)?.logger,
           provider,
           calls,
-          ERC20_TOKEN_ADDRESSES['6test'],
           password
         )
 
@@ -178,6 +179,18 @@ const TransactionCard = (props: {
     } else {
       handleSendTransaction()
     }
+  }
+
+  const handleSendOtp = async () => {
+    await client
+      .get(`/account/tx-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}`)
+      .then(res => {
+        setOtpSent(true)
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 
   const handleClose = () => {
@@ -238,7 +251,7 @@ const TransactionCard = (props: {
         </CardContent>
       </Card>
       <div>
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose} maxWidth='xs' fullWidth>
           <DialogTitle>Enter your details</DialogTitle>
           <DialogContent>
             <TextField
@@ -251,7 +264,7 @@ const TransactionCard = (props: {
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
-            {/* <TextField
+            <TextField
               margin='dense'
               label='OTP'
               type='text'
@@ -259,7 +272,14 @@ const TransactionCard = (props: {
               variant='standard'
               value={otp}
               onChange={e => setOtp(e.target.value)}
-            /> */}
+            />
+            <Typography
+              color={isOtpSent ? 'secondary' : 'primary'}
+              sx={{ '&:hover': { cursor: isOtpSent ? 'pointer' : 'default' } }}
+              onClick={handleSendOtp}
+            >
+              {isOtpSent ? 'Otp sent to your email, please check your email!' : 'Send OTP to my email.'}
+            </Typography>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

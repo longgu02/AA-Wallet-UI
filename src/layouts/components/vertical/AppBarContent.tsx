@@ -53,7 +53,7 @@ const AppBarContent = (props: Props) => {
             <Menu />
           </IconButton>
         ) : null}
-        <TextField
+        {/* <TextField
           size='small'
           sx={{ '& .MuiOutlinedInput-root': { borderRadius: 4 } }}
           InputProps={{
@@ -63,14 +63,14 @@ const AppBarContent = (props: Props) => {
               </InputAdornment>
             )
           }}
-        />
+        /> */}
       </Box>
       <Box className='actions-right' sx={{ display: 'flex', alignItems: 'center' }}>
         <ConnectAccountBox />
         {/* <ConnectWalletButton /> */}
-        <ModeToggler settings={settings} saveSettings={saveSettings} />
-        <NotificationDropdown />
-        <UserDropdown />
+        {/* <ModeToggler settings={settings} saveSettings={saveSettings} /> */}
+        {/* <NotificationDropdown />
+        <UserDropdown /> */}
       </Box>
     </Box>
   )

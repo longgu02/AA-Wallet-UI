@@ -12,14 +12,19 @@ import { client } from 'src/services/client'
 import { executeCalls } from 'src/utils/userOp'
 import { SUBPLUGIN_ADDRESS } from 'src/constant/address'
 import { subscriptionPluginAbi, subscriptionPluginBytecode } from 'src/constant/abis/plugins/subscriptionPluginAbi'
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
+import { CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
+import useNotify from 'src/hooks/useNotify'
 
 export default function ServiceCard(props: { data: any }) {
   const { data } = props
   const { accounts } = useSelector(state => state.account)
   const { provider } = useSelector((state: any) => state.wallet)
   const [open, setOpen] = React.useState<boolean>(false)
+  const [otp, setOtp] = React.useState<string>('')
+  const [isOtpSent, setOtpSent] = React.useState<boolean>(false)
+  const [isLoading, setLoading] = React.useState<boolean>(false)
   const [password, setPassword] = React.useState<string>('')
+  const { successNotify, errorNotify } = useNotify()
 
   const handleOpen = () => {
     if (accounts.find((acc: any) => acc.isSelected == true)?.logger != 'eoa') {
@@ -33,7 +38,21 @@ export default function ServiceCard(props: { data: any }) {
     setOpen(false)
   }
 
+  const handleSendOtp = async () => {
+    await client
+      .get(`/account/register-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}`)
+      .then(res => {
+        setOtpSent(true)
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
   const handleSubscribe = async () => {
+    setLoading(true)
+    setOpen(false)
     const SubscriptionPlugin = new ContractFactory(subscriptionPluginAbi, subscriptionPluginBytecode)
     await executeCalls(
       accounts.find(acc => acc.isSelected)?.address[0],
@@ -51,6 +70,14 @@ export default function ServiceCard(props: { data: any }) {
       // ERC20_TOKEN_ADDRESSES['6test'],
       password
     )
+      .then(res => {
+        successNotify('Subscribe successfully!')
+      })
+      .catch(err => {
+        errorNotify('Error: ' + err.message)
+      })
+    setLoading(false)
+
     // await subscribeService(
     //   accounts.find(acc => acc.isSelected)?.address[0],
     //   data.address,
@@ -93,11 +120,11 @@ export default function ServiceCard(props: { data: any }) {
       </CardContent>
       <CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button size='small' onClick={handleOpen}>
-          Subscribe
+          {isLoading ? <CircularProgress /> : 'Subscribe'}
         </Button>
       </CardActions>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Enter your details</DialogTitle>
+      <Dialog open={open} onClose={handleClose} maxWidth='xs' fullWidth>
+        <DialogTitle>Enter your password and OTP</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -109,15 +136,22 @@ export default function ServiceCard(props: { data: any }) {
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
-          {/* <TextField
-              margin='dense'
-              label='OTP'
-              type='text'
-              fullWidth
-              variant='standard'
-              value={otp}
-              onChange={e => setOtp(e.target.value)}
-            /> */}
+          <TextField
+            margin='dense'
+            label='OTP'
+            type='text'
+            fullWidth
+            variant='standard'
+            value={otp}
+            onChange={e => setOtp(e.target.value)}
+          />
+          <Typography
+            color={isOtpSent ? 'secondary' : 'primary'}
+            sx={{ '&:hover': { cursor: isOtpSent ? 'default' : 'pointer' } }}
+            onClick={handleSendOtp}
+          >
+            {isOtpSent ? 'Otp sent to your email, please check your email!' : 'Send OTP to my email.'}
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

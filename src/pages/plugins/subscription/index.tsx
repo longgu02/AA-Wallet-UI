@@ -30,6 +30,7 @@ const SubscriptionPage = () => {
   const [openPassword, setOpenPassword] = useState(false)
 
   const handleInstall = async () => {
+    setOpenPassword(false)
     setInstallLoading(true)
     await installPlugin(
       accounts.find(acc => acc.isSelected)?.address[0],
@@ -94,7 +95,7 @@ const SubscriptionPage = () => {
             <Grid container spacing={3}>
               {services.length > 0 &&
                 services.map((service: any) => (
-                  <Grid key={service._id} item xs={4}>
+                  <Grid key={service._id} item xs={12} md={4}>
                     <ServiceCard data={service} />
                   </Grid>
                 ))}
@@ -136,8 +137,8 @@ const SubscriptionPage = () => {
           </Typography>
         </Box>
       )}
-      <Dialog open={openPassword} onClose={() => setOpenPassword(false)}>
-        <DialogTitle>Enter your details</DialogTitle>
+      <Dialog open={openPassword} onClose={() => setOpenPassword(false)} maxWidth='xs' fullWidth>
+        <DialogTitle>Enter your password</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus

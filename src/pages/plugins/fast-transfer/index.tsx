@@ -21,6 +21,7 @@ import { accountAbi } from 'src/constant/abis/accountAbi'
 import { subscriptionPluginAbi, subscriptionPluginBytecode } from 'src/constant/abis/plugins/subscriptionPluginAbi'
 import { FASTPLUGIN_ADDRESS } from 'src/constant/address'
 import { getJsonRpcProvider } from 'src/constant/chain'
+import useNotify from 'src/hooks/useNotify'
 import { client } from 'src/services/client'
 import { createFastSession, fastTranfer, installPlugin } from 'src/utils/plugin'
 import CreateSessionButton from 'src/views/fast-transfer/CreateSessionButton'
@@ -42,6 +43,7 @@ const SubscriptionPage = () => {
   const [isTxLoading, setTxLoading] = useImmer<any>({})
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+  const { successNotify, errorNotify } = useNotify()
 
   useEffect(() => {
     client
@@ -134,9 +136,11 @@ const SubscriptionPage = () => {
       accounts.find(acc => acc.isSelected)?.publicKey
     )
       .then(res => {
+        successNotify('Tranfer successfully!')
         console.log(res)
       })
       .catch(err => {
+        errorNotify('Error: ' + err.message)
         console.log(err)
       })
     setTxLoading(draft => {
@@ -291,8 +295,8 @@ const SubscriptionPage = () => {
           </Typography>
         </Box>
       )}
-      <Dialog open={openPassword} onClose={() => setOpenPassword(false)}>
-        <DialogTitle>Enter your details</DialogTitle>
+      <Dialog open={openPassword} onClose={() => setOpenPassword(false)} maxWidth='xs' fullWidth>
+        <DialogTitle>Enter your password</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
