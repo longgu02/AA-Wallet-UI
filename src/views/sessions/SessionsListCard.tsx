@@ -43,7 +43,7 @@ const SessionsListCard = (props: SessionsListCardProps) => {
       })
   }
 
-  const handleEdit = (id: string) => {}
+  // const handleEdit = (id: string) => {}
 
   return (
     <Card sx={{ marginBottom: 4, padding: 4 }}>

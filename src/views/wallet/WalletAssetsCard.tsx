@@ -3,9 +3,8 @@ import { useState, useEffect } from 'react'
 import { fetchAllBalance } from 'src/utils/connection'
 import { useSelector } from 'react-redux'
 import { useImmer } from 'use-immer'
-import { JsonRpcProvider, formatEther } from 'ethers'
+import { formatEther } from 'ethers'
 import TablePaper from 'src/components/table-paper'
-import { getJsonRpcProvider } from 'src/constant/chain'
 
 interface Data {
   token: string

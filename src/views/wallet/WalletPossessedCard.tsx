@@ -12,7 +12,7 @@ const WalletPossessedCard = () => {
       <Box>
         {accounts
           .find((acc: any) => acc.isSelected)
-          ?.address?.map(add => (
+          ?.address?.map((add: any) => (
             <Box key={add} sx={{ cursor: 'pointer' }}>
               <Typography>{add}</Typography>
             </Box>
