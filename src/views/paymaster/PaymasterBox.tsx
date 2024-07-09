@@ -3,14 +3,15 @@ import Button from '@mui/material/Button'
 import { styled } from '@mui/material/styles'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import IconButton from '@mui/material/IconButton'
 import CloseIcon from '@mui/icons-material/Close'
 import Typography from '@mui/material/Typography'
 import { Box, Divider, Tab, Tabs } from '@mui/material'
-import PaymasterOverview from './paymasterOptions/Overview'
-import PaymasterGasTank from './paymasterOptions/GasTank'
+
+// import DialogContent from '@mui/material/DialogContent'
+// import PaymasterOverview from './paymasterOptions/Overview'
+// import PaymasterGasTank from './paymasterOptions/GasTank'
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -21,31 +22,31 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   }
 }))
 
-interface TabPanelProps {
-  children?: React.ReactNode
-  index: number
-  value: number
-}
+// interface TabPanelProps {
+//   children?: React.ReactNode
+//   index: number
+//   value: number
+// }
 
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props
+// function CustomTabPanel(props: TabPanelProps) {
+//   const { children, value, index, ...other } = props
 
-  return (
-    <div
-      role='tabpanel'
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  )
-}
+//   return (
+//     <div
+//       role='tabpanel'
+//       hidden={value !== index}
+//       id={`simple-tabpanel-${index}`}
+//       aria-labelledby={`simple-tab-${index}`}
+//       {...other}
+//     >
+//       {value === index && (
+//         <Box sx={{ p: 3 }}>
+//           <Typography>{children}</Typography>
+//         </Box>
+//       )}
+//     </div>
+//   )
+// }
 
 export default function PaymasterBox() {
   const [open, setOpen] = React.useState(false)
@@ -105,7 +106,7 @@ export default function PaymasterBox() {
         >
           <CloseIcon />
         </IconButton>
-        <DialogContent>
+        {/* <DialogContent>
           <CustomTabPanel value={value} index={0}>
             <PaymasterOverview />
           </CustomTabPanel>
@@ -115,10 +116,10 @@ export default function PaymasterBox() {
           <CustomTabPanel value={value} index={2}>
             Item Three
           </CustomTabPanel>
-        </DialogContent>
+        </DialogContent> */}
         <DialogActions>
           <Button autoFocus onClick={handleClose}>
-            Delete
+            Exit
           </Button>
         </DialogActions>
       </BootstrapDialog>

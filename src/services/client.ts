@@ -17,4 +17,5 @@ export const nextClient = createClient('')
 
 export const testClient = createClient('http://localhost:3001')
 
-export const client = createClient('http://localhost:6868')
+export const clientLocal = createClient('http://localhost:6868')
+export const client = createClient('https://smart-account-server.onrender.com')
