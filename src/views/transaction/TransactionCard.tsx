@@ -193,6 +193,19 @@ const TransactionCard = (props: {
       })
   }
 
+  const handleCheckOtp = async () => {
+    await client
+      .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}/${otp}`)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .then(res => {
+        handleSendTransaction()
+      })
+      .catch(err => {
+        errorNotify('Wrong OTP!')
+        console.log(err)
+      })
+  }
+
   const handleClose = () => {
     setOpen(false)
   }
@@ -283,7 +296,7 @@ const TransactionCard = (props: {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleSendTransaction}>Execute</Button>
+            <Button onClick={handleCheckOtp}>Execute</Button>
           </DialogActions>
         </Dialog>
       </div>

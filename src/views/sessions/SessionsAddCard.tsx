@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Box,
   Button,
@@ -156,6 +157,18 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
     setOpen(false)
   }
 
+  const handleCheckOtp = async () => {
+    await client
+      .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}/${otp}`)
+      .then(res => {
+        handleCreate()
+      })
+      .catch(err => {
+        errorNotify('Wrong OTP!')
+        console.log(err)
+      })
+  }
+
   console.log(fromDate.unix(), toDate.unix())
 
   return (
@@ -237,7 +250,7 @@ const SessionsAddCard = (props: SessionAddCardProp) => {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleCreate}>Execute</Button>
+            <Button onClick={handleCheckOtp}>Execute</Button>
           </DialogActions>
         </Dialog>
       </Card>

@@ -104,6 +104,19 @@ export default function ServiceCard(props: { data: any }) {
     //   })
   }
 
+  const handleCheckOtp = async () => {
+    await client
+      .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}/${otp}`)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .then(res => {
+        handleSubscribe()
+      })
+      .catch(err => {
+        errorNotify('Wrong OTP!')
+        console.log(err)
+      })
+  }
+
   return (
     <Card sx={{}}>
       <CardMedia component='img' alt='green iguana' height='140' image={data.logo} />
@@ -155,7 +168,7 @@ export default function ServiceCard(props: { data: any }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSubscribe}>Subscribe</Button>
+          <Button onClick={handleCheckOtp}>Subscribe</Button>
         </DialogActions>
       </Dialog>
     </Card>

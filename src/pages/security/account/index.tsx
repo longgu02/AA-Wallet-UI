@@ -85,6 +85,19 @@ const Account = () => {
     setOpen(false)
   }
 
+  const handleCheckOtp = async () => {
+    await client
+      .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}/${otp}`)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .then(res => {
+        handleTransfer()
+      })
+      .catch(err => {
+        errorNotify('Wrong OTP!')
+        console.log(err)
+      })
+  }
+
   return (
     <Box>
       <Typography variant='h4' sx={{ marginBottom: 3 }}>
@@ -165,7 +178,7 @@ const Account = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleTransfer}>Execute</Button>
+          <Button onClick={handleCheckOtp}>Execute</Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -78,6 +78,19 @@ const CreateSessionButton = (props: any) => {
       })
   }
 
+  const handleCheckOtp = async () => {
+    await client
+      .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected == true)?.logger}/${otp}`)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .then(res => {
+        handleCreateSession()
+      })
+      .catch(err => {
+        errorNotify('Wrong OTP!')
+        console.log(err)
+      })
+  }
+
   // const handleCheckOtp = async () => {
   //   await client
   //     .get(`/account/check-otp/${accounts.find((acc: any) => acc.isSelected)?.logger}/${otp}`)
@@ -131,7 +144,7 @@ const CreateSessionButton = (props: any) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleCreateSession}>Execute</Button>
+          <Button onClick={handleCheckOtp}>Execute</Button>
         </DialogActions>
       </Dialog>
     </>
