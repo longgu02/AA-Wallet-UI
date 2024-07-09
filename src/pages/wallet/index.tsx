@@ -4,7 +4,6 @@ import WalletHeaderCard from 'src/views/wallet/WalletHeaderCard'
 import WalletPossessedCard from 'src/views/wallet/WalletPossessedCard'
 
 // import WalletTransactionCard, { INITIAL_STATE } from 'src/views/wallet/WalletTransactionCard'
-import { useImmer } from 'use-immer'
 
 const WalletPage = () => {
   // const [transactionData, updateTransactionData] = useImmer([INITIAL_STATE])
