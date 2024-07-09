@@ -14,8 +14,9 @@ import Typography, { TypographyProps } from '@mui/material/Typography'
 // ** Third Party Components
 import PerfectScrollbarComponent from 'react-perfect-scrollbar'
 import ConnectWalletButton from '../ConnectWalletButton'
-import { useDispatch, useSelector } from 'react-redux'
+import { RootStateOrAny, useDispatch } from 'react-redux'
 import { selectAccount } from 'src/redux/connection/accountSlice'
+import { useAppSelector } from 'src/redux/hooks'
 
 // ** Styled Menu component
 // const Menu = styled(MuiMenu)<MenuProps>(({ theme }) => ({
@@ -84,7 +85,7 @@ const NotificationDropdown = () => {
 
   // ** Hook
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
-  const { accounts } = useSelector((state: any) => state.account)
+  const { accounts } = useAppSelector((state: RootStateOrAny) => state.account)
   const dispatch = useDispatch()
 
   // const handleDropdownOpen = (event: SyntheticEvent) => {

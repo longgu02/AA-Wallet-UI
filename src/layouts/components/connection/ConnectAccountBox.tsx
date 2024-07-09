@@ -1,8 +1,8 @@
-import { Box, IconButton, Typography, useMediaQuery } from '@mui/material'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Box, Typography, useMediaQuery } from '@mui/material'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from 'src/redux/hooks'
 import { formatAddress } from 'src/utils'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { SyntheticEvent, useState } from 'react'
 import AccountDropdown from './dropdown/AccountDropdown'
 import { styled, Theme } from '@mui/material/styles'
@@ -31,7 +31,7 @@ const ConnectAccountBox = () => {
   const [anchorEl, setAnchorEl] = useState<(EventTarget & Element) | null>(null)
 
   // ** Hook
-  const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
+  // const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
 
   const handleDropdownOpen = (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget)
