@@ -1,27 +1,71 @@
-import { Card, CardContent, Grid } from '@mui/material'
+/* eslint-disable @typescript-eslint/ban-types */
+import { Card, CardContent, CircularProgress, Grid } from '@mui/material'
 import { formatEther } from 'ethers'
 import { useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import * as Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
-import { getJsonRpcProvider } from 'src/constant/chain'
+import { useImmer } from 'use-immer'
+import { fetchAllBalance } from 'src/utils/connection'
+
+// interface Data {
+//   token: string
+//   balance: string
+//   price: string
+// }
 
 const WalletHeaderCard = () => {
   const { accounts } = useSelector((state: any) => state.account)
-  const [balance, setBalance] = useState<bigint | undefined>(undefined)
+  const [balance, setBalance] = useState<BigInt>(BigInt(0))
   console.log({ accounts })
-  useEffect(() => {
-    const provider = getJsonRpcProvider()
-    if (accounts.length > 0) {
-      provider
-        .getBalance(accounts.find((acc: any) => acc.isSelected == true)?.address[0])
-        .then(balance => {
-          setBalance(balance)
-          console.log(balance)
-        })
-        .catch(err => console.error(err))
+  const [rows, updateRows] = useImmer<Array<any>>([])
+  const [isLoading, setLoading] = useState<boolean>(false)
+
+  function createData(token: string, balance: string, index: number) {
+    const color = ['#3498db', '#e8e337', '#e8e337', '#e8e337', '#e8e337']
+
+    return {
+      name: token,
+      y: balance && Number(balance),
+      color: color[index]
     }
-  }, [accounts])
+  }
+
+  useEffect(() => {
+    setLoading(true)
+    if (accounts.length > 0) {
+      fetchAllBalance(accounts.find((acc: any) => acc.isSelected == true)?.address[0])
+        .then((res: any) => {
+          let total = BigInt(0)
+          updateRows([])
+          res.map((token: any, index: any) => {
+            total += BigInt(token.balance)
+            updateRows(
+              draft => void draft.push(createData(token.name.toUpperCase(), formatEther(token.balance), index))
+            )
+          })
+          setBalance(total)
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
+    setLoading(false)
+  }, [accounts, updateRows])
+
+  // useEffect(() => {
+  //   const provider = getJsonRpcProvider()
+  //   if (accounts.length > 0) {
+  //     provider
+  //       .getBalance(accounts.find((acc: any) => acc.isSelected == true)?.address[0])
+  //       .then(balance => {
+  //         setBalance(balance)
+  //         console.log(balance)
+  //       })
+  //       .catch(err => console.error(err))
+  //   }
+  // }, [accounts])
 
   const options = {
     credits: {
@@ -38,12 +82,12 @@ const WalletHeaderCard = () => {
       verticalAlign: 'middle',
       align: 'center',
       floating: true,
-      text: `$${balance && Number(formatEther(balance)).toFixed(4)}`,
+      text: isLoading ? <CircularProgress /> : `$${balance && Number(formatEther(balance.toString())).toFixed(4)}`,
       style: {
         color: '#ffffff',
         fontSize: '24px'
       },
-      x: -54
+      x: -40
     },
     plotOptions: {
       pie: {
@@ -64,14 +108,8 @@ const WalletHeaderCard = () => {
     },
     series: [
       {
-        name: 'Balance',
-        data: [
-          {
-            name: 'Ethereum',
-            y: balance && Number(formatEther(balance)),
-            color: '#3498db'
-          }
-        ]
+        name: 'Balance', // Separate series for ETH
+        data: rows
       }
     ]
   }
